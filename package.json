@@ -1,0 +1,45 @@
+{
+  "name": "ingravity-security",
+  "version": "1.2.0",
+  "description": "Autonomous Web3 Security Swarm: $0.03 Fast-Ping, $0.10 Pre-Flight EVM Firewall, Direct 0x Token Honeypot Scanner, Safe-Harbor Rescue Provider & STDIO MCP Bridge for Coinbase AgentKit, ElizaOS & Claude/Cursor on Base Mainnet (eip155:8453) via x402 v2 USDC.",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "bin": {
+    "ingravity-mcp": "./mcp.js"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "mcp.js",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node test.js"
+  },
+  "keywords": [
+    "agentkit",
+    "coinbase-agentkit",
+    "elizaos",
+    "ai16z",
+    "mcp",
+    "mcp-server",
+    "web3-security",
+    "base",
+    "x402",
+    "transaction-firewall",
+    "honeypot-detector",
+    "solidity-audit",
+    "whitehat-rescue",
+    "autonomous-agents"
+  ],
+  "author": "David del Moral (Ingravity Security Swarm)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/daviddelmoral/ingravity-security"
+  },
+  "bugs": {
+    "url": "https://red-shape-1b3b.daviddelmoral79.workers.dev"
+  },
+  "homepage": "https://red-shape-1b3b.daviddelmoral79.workers.dev"
+}
