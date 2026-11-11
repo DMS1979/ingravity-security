@@ -15,6 +15,8 @@ export interface FastPingParams {
 export interface TxFirewallParams {
   to: string;
   data: string;
+  chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
   from?: string;
   value?: string;
   ticketId?: string;
@@ -24,12 +26,16 @@ export interface TxFirewallParams {
 export interface TokenRugScannerParams {
   tokenAddress?: string;
   chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
   code?: string;
   tokenName?: string;
   capitalAtRiskUsd?: number;
 }
 
 export interface DefiMathGuardParams {
+  chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
+  capitalAtRiskUsd?: number;
   amm?: {
     reserveIn: string;
     reserveOut: string;
@@ -53,6 +59,8 @@ export interface AuditSolidityParams {
   code: string;
   contractName?: string;
   contractAddress?: string;
+  chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
   ownerTreasury?: string;
   capitalAtRiskUsd?: number;
 }
@@ -61,6 +69,8 @@ export interface ProtocolDossierParams {
   protocolName?: string;
   tvlTargetUsd?: number;
   contractAddress?: string;
+  chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
   ownerTreasury?: string;
   contracts: Array<{ name: string; code: string }>;
 }
@@ -69,6 +79,9 @@ export interface DeepExploitBountyParams {
   protocolName: string;
   poolAddress?: string;
   targetContract?: string;
+  chainId?: number;
+  tier?: "FULL" | "ESSENTIAL";
+  targetId?: string;
   ownerTreasury?: string;
   tvlUsd?: number;
   capitalAtRiskUsd?: number;

@@ -1,12 +1,12 @@
 /**
- * INGRAVITY SECURITY SDK (ingravity-security) v1.2.0
+ * INGRAVITY SECURITY SDK (ingravity-security) v1.3.0
  * -----------------------------------------------------------------------
- * Autonomous Web3 Security, $0.03 Fast-Ping, Pre-Flight Transaction Firewall,
- * Live Base RPC Token Honeypot Scanner, ERC-8021 Attribution & Atomic EIP-5792
+ * Autonomous 5-EVM Web3 Security, $0.01 Fast-Ping, Pre-Flight Transaction Firewall,
+ * Live EVM RPC Token Honeypot Scanner, ERC-8021 Attribution & Atomic EIP-5792
  * Safe-Harbor Rescue Provider for Coinbase AgentKit, ElizaOS, LangChain & MCP
- * on Base Mainnet (eip155:8453).
+ * on Base (8453), Arbitrum (42161), Optimism (10), Polygon (137), and Ethereum (1).
  *
- * Official x402 v2 Catalog (Swarm v3.10.0):
+ * Official x402 v2 Catalog (Swarm v3.13.0):
  *  - Zero Free Verdict Leaks: 100% deterministic paid x402 v2 endpoints
  *  - Settlement Network: Base Mainnet (eip155:8453)
  *  - Payee (Trust Wallet): 0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f
@@ -22,7 +22,7 @@ const BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const BASE_CHAIN_ID = 8453;
 const ERC8021_BUILDER_CODE = "bc_i26d7owr";
 const ERC8021_SUFFIX_HEX = "0b62635f69323664376f77720080218021802180218021802180218021";
-const SDK_VERSION = "1.2.0";
+const SDK_VERSION = "1.3.0";
 
 function encodeErc8021Calldata(calldataHex = "0x") {
   const clean = String(calldataHex || "0x").trim();
@@ -88,12 +88,12 @@ class IngravitySecurityActionProvider {
     return [
       {
         name: "ingravity_fast_ping",
-        description: "Ultra-low-cost binary SAFE/DANGER address gate on Base ($0.03 USDC flat via x402). Built for high-frequency bots with strict <=$0.05 auto-pay limits. Returns boolean SAFE/DANGER only (zero forensic details).",
+        description: "Ultra-low-cost binary SAFE/DANGER address gate across 5 EVM chains ($0.01 USDC flat via x402). Built for high-frequency bots with strict <=$0.05 auto-pay limits. Returns boolean SAFE/DANGER only (zero forensic details).",
         schema: {
           type: "object",
           properties: {
-            address: { type: "string", description: "Base Mainnet contract, token, or spender address (0x...)" },
-            chainId: { type: "integer", description: "EVM Chain ID (default: 8453)" }
+            address: { type: "string", description: "EVM contract, token, or spender address (0x...)" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" }
           },
           required: ["address"]
         },
@@ -101,12 +101,14 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_tx_firewall",
-        description: "Deep pre-sign EVM transaction firewall on Base via x402 ($0.10 USDC floor + 0.15% Pre-Flight / 5%-10% Whitehat Safe-Harbor Rescue). Decodes calldata, inspects live EIP-1967/1167 proxy slots via RPC, and blocks wallet drainers & unlimited approvals before signing.",
+        description: "Deep pre-sign 5-EVM transaction firewall via x402 ($0.10 USDC floor + 0.15% Pre-Flight / 5%-10% Whitehat Safe-Harbor Rescue, Anti-Bypass). Decodes calldata, inspects live EIP-1967/1167 proxy slots via RPC, and blocks wallet drainers & unlimited approvals before signing.",
         schema: {
           type: "object",
           properties: {
             to: { type: "string", description: "Target contract address (0x...)" },
             data: { type: "string", description: "Hexadecimal calldata (0x...)" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
             from: { type: "string", description: "Optional sender wallet address (0x...)" },
             value: { type: "string", description: "Optional native ETH value in wei (default: '0')" },
             ticketId: { type: "string", description: "Optional ZK-EC Rescue Ticket ID (TICKET-8453-...)" },
@@ -118,12 +120,13 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_token_rug_scanner",
-        description: "Direct Base ERC-20 honeypot & rugpull forensic scanner by tokenAddress ($0.50 USDC Full Report / $0.25 USDC Signal Only via x402). Audits any Base token directly by 0x address via live RPC bytecode disassembly & proxy storage slots — no Solidity source code required.",
+        description: "Direct 5-EVM ERC-20 honeypot & rugpull forensic scanner by tokenAddress ($0.50 USDC Full Report / $0.25 USDC Signal Only via x402). Audits any EVM token directly by 0x address via live RPC bytecode disassembly & proxy storage slots — no Solidity source code required.",
         schema: {
           type: "object",
           properties: {
-            tokenAddress: { type: "string", description: "Base Mainnet ERC-20 token address (0x...) — no .sol source required" },
-            chainId: { type: "integer", description: "EVM Chain ID (default: 8453)" },
+            tokenAddress: { type: "string", description: "EVM ERC-20 token address (0x...) — no .sol source required" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
             code: { type: "string", description: "Optional Solidity (.sol) source code if auditing pre-deployment" },
             tokenName: { type: "string", description: "Optional token ticker or name" },
             capitalAtRiskUsd: { type: "number", description: "Optional swap position size in USD" }
@@ -133,10 +136,13 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_defi_math_guard",
-        description: "Exact BigInt AMM slippage, MEV sandwich & leverage liquidation guard on Base via x402 ($0.15 USDC Full / $0.10 USDC Signal Only). 48-step binary search for mathematically provable minAmountOut.",
+        description: "Exact BigInt AMM slippage, MEV sandwich & leverage liquidation guard across 5 EVM chains via x402 ($0.15 USDC Full / $0.10 USDC Signal Only). 48-step binary search for mathematically provable minAmountOut.",
         schema: {
           type: "object",
           properties: {
+            chainId: { type: "integer", description: "EVM Chain ID (default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
+            capitalAtRiskUsd: { type: "number", description: "Optional swap/position value at risk in USD" },
             amm: {
               type: "object",
               properties: {
@@ -155,13 +161,15 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_audit_solidity",
-        description: "Deterministic 24-vector Solidity security audit & live Base TVL Safe-Harbor protection ($0.85 USDC Full / $0.35 USDC Signal Only via x402). Includes line-by-line fixes plus optional atomic EIP-5792 wallet_sendCalls / sequential EOA Safe-Harbor rescue bundle (5%-10% split) when contractAddress holds live funds.",
+        description: "Deterministic 24-vector Solidity security audit & live EVM TVL Safe-Harbor protection ($0.85 USDC Full / $0.35 USDC Signal Only via x402). Includes line-by-line fixes plus optional atomic EIP-5792 wallet_sendCalls / sequential EOA Safe-Harbor rescue bundle (5%-10% split) when contractAddress holds live funds.",
         schema: {
           type: "object",
           properties: {
             code: { type: "string", description: "Raw Solidity (.sol) source code to audit" },
             contractName: { type: "string", description: "Optional contract filename" },
-            contractAddress: { type: "string", description: "Optional deployed Base Mainnet contract address (0x...) for live TVL verification & Safe-Harbor rescue bundle" },
+            contractAddress: { type: "string", description: "Optional deployed EVM contract address (0x...) for live TVL verification & Safe-Harbor rescue bundle" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
             ownerTreasury: { type: "string", description: "Optional safe treasury recipient (0x...) for 90%-95% atomic Safe-Harbor sweep" },
             capitalAtRiskUsd: { type: "number", description: "Optional target/current TVL in USD" }
           },
@@ -171,13 +179,15 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_protocol_dossier",
-        description: "Multi-contract DeFi protocol security dossier, cross-contract Read-Only Reentrancy graph & ERC-4626/Oracle invariant engine ($12.00 USDC Full / $3.50 USDC Signal Only via x402). Supports live Base contractAddress TVL verification & Safe-Harbor rescue split.",
+        description: "Multi-contract DeFi protocol security dossier, cross-contract Read-Only Reentrancy graph & ERC-4626/Oracle invariant engine ($12.00 USDC Full / $3.50 USDC Signal Only via x402). Supports live EVM contractAddress TVL verification & Safe-Harbor rescue split.",
         schema: {
           type: "object",
           properties: {
             protocolName: { type: "string", description: "DeFi protocol name" },
             tvlTargetUsd: { type: "number", description: "Target or current TVL in USD" },
-            contractAddress: { type: "string", description: "Optional live Base vault/pool address (0x...) for on-chain liquidity verification" },
+            contractAddress: { type: "string", description: "Optional live EVM vault/pool address (0x...) for on-chain liquidity verification" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
             ownerTreasury: { type: "string", description: "Optional protocol multisig/treasury address (0x...)" },
             contracts: {
               type: "array",
@@ -195,9 +205,13 @@ class IngravitySecurityActionProvider {
           type: "object",
           properties: {
             protocolName: { type: "string", description: "Target protocol identifier" },
-            poolAddress: { type: "string", description: "Target Base Mainnet pool/vault address (0x...)" },
+            poolAddress: { type: "string", description: "Target EVM pool/vault address (0x...)" },
+            chainId: { type: "integer", description: "EVM Chain ID (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; default: 8453)" },
+            tier: { type: "string", enum: ["FULL", "ESSENTIAL"], description: "Optional SLA tier (FULL or ESSENTIAL)" },
+            targetId: { type: "string", description: "Optional verified bounty/rescue target identifier" },
             ownerTreasury: { type: "string", description: "Optional protocol owner/multisig recipient for 90%-95% rescued funds" },
-            tvlUsd: { type: "number", description: "Optional estimated pool TVL in USD (auto-verified on-chain when poolAddress is on Base)" },
+            tvlUsd: { type: "number", description: "Optional estimated pool TVL in USD (auto-verified on-chain when poolAddress is deployed)" },
+            capitalAtRiskUsd: { type: "number", description: "Optional capital at risk in USD" },
             code: { type: "string", description: "Optional Solidity contract source code" }
           },
           required: ["protocolName"]
@@ -263,9 +277,13 @@ class IngravitySecurityActionProvider {
 
       const accepts = (Array.isArray(payReq.accepts) && payReq.accepts.length ? payReq.accepts : [payReq]).map(sanitizeX402V2Accept);
       const budgetAtoms = this.maxSpendUsdc != null ? BigInt(Math.floor(this.maxSpendUsdc * 1e6)) : null;
-      const accept = budgetAtoms == null
-        ? accepts[0]
-        : accepts.find((a) => BigInt(a.amount) <= budgetAtoms) || null;
+      const requestedTier = body && body.tier ? String(body.tier).trim().toUpperCase() : null;
+      const affordable = budgetAtoms == null
+        ? accepts
+        : accepts.filter((a) => BigInt(a.amount) <= budgetAtoms);
+      const accept = (requestedTier
+        ? affordable.find((a) => String((a.extra && a.extra.tier) || "FULL").toUpperCase() === requestedTier)
+        : null) || affordable[0] || null;
 
       const quote = {
         status: "402_PAYMENT_REQUIRED",
@@ -344,7 +362,7 @@ class IngravitySecurityActionProvider {
     return this._callEndpoint("/api/v1/fast-ping", params);
   }
 
-  // Backwards-compatible alias: routes legacy v1.0 callers directly to paid $0.03 Fast-Ping (zero free leaks)
+  // Backwards-compatible alias: routes legacy v1.0 callers directly to paid $0.01 Fast-Ping (zero free leaks)
   async quickCheck(params = {}) {
     const addr = params.address || params.to || params.tokenAddress;
     if (addr) return this.fastPing({ address: addr, chainId: params.chainId || 8453 });
@@ -373,7 +391,10 @@ class IngravitySecurityActionProvider {
             feeBps: params.feeBps || 30,
             userSlippageBps: params.slippageTolerancePct != null ? Math.round(Number(params.slippageTolerancePct) * 100) : (params.userSlippageBps || 100)
           },
-          ...(params.leverage ? { leverage: params.leverage } : {})
+          ...(params.leverage ? { leverage: params.leverage } : {}),
+          ...(params.chainId != null ? { chainId: params.chainId } : {}),
+          ...(params.tier ? { tier: params.tier } : {}),
+          ...(params.capitalAtRiskUsd != null ? { capitalAtRiskUsd: params.capitalAtRiskUsd } : {})
         };
     return this._callEndpoint("/api/v1/defi-math-guard", normalized);
   }
@@ -392,6 +413,10 @@ class IngravitySecurityActionProvider {
       poolAddress: params.poolAddress || params.targetContract,
       ownerTreasury: params.ownerTreasury,
       tvlUsd: params.tvlUsd != null ? params.tvlUsd : params.capitalAtRiskUsd,
+      ...(params.capitalAtRiskUsd != null ? { capitalAtRiskUsd: params.capitalAtRiskUsd } : {}),
+      ...(params.chainId != null ? { chainId: params.chainId } : {}),
+      ...(params.tier ? { tier: params.tier } : {}),
+      ...(params.targetId ? { targetId: params.targetId } : {}),
       code: params.code
     };
     return this._callEndpoint("/api/v1/deep-exploit-bounty", payload);
@@ -413,7 +438,7 @@ class IngravitySecurityActionProvider {
 const fastPingAction = {
   name: "INGRAVITY_FAST_PING",
   similes: ["FAST_ADDRESS_CHECK", "BINARY_DRAINER_CHECK", "PING_CONTRACT_SAFETY"],
-  description: "Ultra-fast $0.03 USDC binary SAFE/DANGER check on any Base Mainnet address (0x...) via x402.",
+  description: "Ultra-fast $0.01 USDC binary SAFE/DANGER check on any Base/EVM address (0x...) via x402.",
   validate: async (runtime, message) => /0x[a-fA-F0-9]{40}/.test(message.content?.text || ""),
   handler: async (runtime, message, state, options, callback) => {
     try {
@@ -424,7 +449,7 @@ const fastPingAction = {
         walletProvider: runtime?.walletProvider || null,
         maxSpendUsdc: runtime?.maxSpendPerAction || 0.05
       });
-      const res = await provider.fastPing({ address, chainId: 8453 });
+      const res = await provider.fastPing({ address, chainId: (options && options.chainId) || 8453 });
       if (callback) callback({ text: `[Ingravity Fast-Ping] ${address} => ${res.verdict || res.status}`, data: res });
       return res;
     } catch (err) {
@@ -489,7 +514,7 @@ const txFirewallAction = {
 const ingravityElizaPlugin = {
   name: "ingravity-security",
   version: SDK_VERSION,
-  description: "Autonomous Web3 Security, $0.03 Fast-Ping, Pre-Flight Firewall & Direct 0x Honeypot Scanner for Base Mainnet (x402 v2)",
+  description: "Autonomous 5-EVM Web3 Security, $0.01 Fast-Ping, Pre-Flight Firewall & Direct 0x Honeypot Scanner (settled on Base Mainnet via x402 v2)",
   actions: [fastPingAction, scanTokenAction, txFirewallAction],
   evaluators: [],
   providers: []

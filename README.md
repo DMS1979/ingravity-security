@@ -1,18 +1,21 @@
-# ingravity-security (v1.2.0)
+# ingravity-security (v1.3.0)
 
-> Autonomous Web3 Pre-Flight Security, `$0.03` Binary Fast-Ping, Direct `0x` Token Honeypot Scanner, Atomic EIP-5792 Safe-Harbor Rescue Provider & STDIO MCP Bridge for **Coinbase AgentKit**, **ElizaOS**, **LangChain**, **Claude Desktop**, and **Cursor** on Base Mainnet (`eip155:8453`).
+> Autonomous 5-EVM Web3 Pre-Flight Security, `$0.01` Binary Fast-Ping, Direct `0x` Token Honeypot Scanner, Atomic EIP-5792 Safe-Harbor Rescue Provider & STDIO MCP Bridge (`2025-06-18`) for **Coinbase AgentKit**, **ElizaOS**, **LangChain**, **Claude Desktop**, and **Cursor** on Base (`8453`), Arbitrum (`42161`), Optimism (`10`), Polygon (`137`), and Ethereum (`1`).
 
-Settles programmatically per-call in native USDC via **x402 v2** with zero subscriptions or API keys.
+Settles programmatically per-call in native USDC via **x402 v2** on Base Mainnet (`eip155:8453`) with zero subscriptions or API keys.
 
-[![npm version](https://img.shields.io/badge/npm-1.2.0-blue.svg)](https://www.npmjs.com/package/ingravity-security)
+[![npm version](https://img.shields.io/badge/npm-1.3.0-blue.svg)](https://www.npmjs.com/package/ingravity-security)
 [![Network](https://img.shields.io/badge/Network-Base%20Mainnet%20(8453)-0052FF.svg)](https://basescan.org)
 [![Settlement](https://img.shields.io/badge/Settlement-x402%20v2%20USDC-10B981.svg)](https://red-shape-1b3b.daviddelmoral79.workers.dev/.well-known/x402)
+[![Glama MCP](https://img.shields.io/badge/Glama-Verified%20Connector-8B5CF6.svg)](https://glama.ai/mcp/connectors/dev.workers.daviddelmoral79.red-shape-1b3b/ingravity-evm-security-mcp)
 
 ---
 
-## What's New in v1.2.0
+## What's New in v1.3.0
 
-* **`ingravity-mcp` STDIO Bridge**: Run `npx -y ingravity-security` (or `ingravity-mcp`) directly inside Claude Desktop, Cursor, Windsurf, or Cline — zero-config JSON-RPC 2.0 bridge to our Streamable-HTTP MCP server.
+* **`$0.01` Fast-Ping Impulse Floor**: Binary `SAFE / DANGER` address verification dropped from `$0.03` to **`$0.01` USDC** (`10000` atomic units) to remove micro-budget friction for autonomous M2M trading bots.
+* **Exact `PAYMENT-REQUIRED` Header + Full 5-EVM Pass-Through**: `deepExploitBounty`, `defiMathGuard`, `txFirewall`, `auditSolidity`, and `protocolDossier` preserve `chainId`, `tier` (`FULL`/`ESSENTIAL`), and `capitalAtRiskUsd` end-to-end across REST, MCP `2025-06-18`, and A2A.
+* **`ingravity-mcp` STDIO Bridge (`MCP 2025-06-18`)**: Run `npx -y --package=ingravity-security ingravity-mcp` inside Claude Desktop, Cursor, Windsurf, or Cline — zero-config JSON-RPC 2.0 + SSE bridge to our verified Streamable-HTTP MCP server.
 * **Automatic `X-Ingravity-Receipt-Token` Session Cache**: Repeat queries for the same `(route, target)` reuse HMAC-SHA256 receipt tokens returned by Cloudflare Durable Objects without re-signing or double-spending USDC.
 * **Strict x402 v2 PayAI Sanitization**: Strips legacy `maxAmountRequired` from `paymentPayload.accepted` objects during EIP-3009 signing for 100% compatibility with Coinbase CDP, PayAI, and Primer facilitators.
 * **ERC-8021 Base Builder Attribution Helper (`encodeErc8021Calldata`)**: Built-in idempotent calldata attribution helper tagging on-chain rescue/revoke bundles with Base Builder Code `bc_i26d7owr`.
@@ -45,7 +48,7 @@ Or local STDIO bridge via `ingravity-mcp`:
   "mcpServers": {
     "ingravity-evm-security": {
       "command": "npx",
-      "args": ["-y", "-p", "ingravity-security@1.2.0", "ingravity-mcp"]
+      "args": ["-y", "-p", "ingravity-security@1.3.0", "ingravity-mcp"]
     }
   }
 }
@@ -92,7 +95,7 @@ const provider = new IngravitySecurityActionProvider({
   walletProvider: evmWalletProvider
 });
 
-// A) $0.03 Fast-Ping for micro-budget bots:
+// A) $0.01 Fast-Ping for micro-budget bots:
 const ping = await provider.fastPing({ address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" });
 
 // B) Direct Base token honeypot scan by 0x address (no .sol needed):
@@ -107,11 +110,11 @@ const attributed = encodeErc8021Calldata("0x095ea7b3...");
 
 ---
 
-## Official x402 v2 Catalog (Swarm v3.10.0)
+## Official x402 v2 Catalog (Swarm v3.13.0)
 
 | Service | Endpoint | Base Full Floor | Signal / Triage | Value / Safe-Harbor Option |
 | :--- | :--- | :--- | :--- | :--- |
-| **Fast-Ping Binary Gate** | `/api/v1/fast-ping` | **`$0.03`** | **`$0.03`** | Flat boolean `SAFE / DANGER` (`<= $0.05` bots) |
+| **Fast-Ping Binary Gate** | `/api/v1/fast-ping` | **`$0.01`** | **`$0.01`** | Flat boolean `SAFE / DANGER` (`<= $0.05` bots) |
 | **Pre-Flight EVM Firewall** | `/api/v1/tx-firewall` | **`$0.10`** | **`$0.10`** | `+0.15%` Pre-Flight / `5%–10%` Rescue Bounty |
 | **DeFi Math & MEV Guard** | `/api/v1/defi-math-guard` | **`$0.15`** | **`$0.10`** | `+0.15%` Protected Swap SLA |
 | **Token Honeypot Scanner (`0x`)** | `/api/v1/token-rug-scanner` | **`$0.50`** | **`$0.25`** | `+0.15%` Position SLA |
@@ -124,5 +127,6 @@ const attributed = encodeErc8021Calldata("0x095ea7b3...");
 * **Payee**: `0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f`
 * **Builder Code**: `bc_i26d7owr` (ERC-8021)
 * **MCP Endpoint**: `https://red-shape-1b3b.daviddelmoral79.workers.dev/mcp`
+* **GitHub Repository**: `https://github.com/DMS1979/ingravity-security`
 
 © 2026 Ingravity Security Swarm.

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
- * ingravity-mcp (ingravity-security v1.2.0 STDIO-to-HTTP MCP Bridge)
+ * ingravity-mcp (ingravity-security v1.3.0 STDIO-to-HTTP MCP Bridge)
  * ----------------------------------------------------------------------------
- * Zero-dependency Model Context Protocol (MCP 2024-11-05) STDIO bridge for
+ * Zero-dependency Model Context Protocol (MCP 2025-06-18) STDIO bridge for
  * Claude Desktop, Cursor, Windsurf, Cline, and autonomous agent runtimes.
  *
  * Forwards JSON-RPC 2.0 MCP calls directly to Ingravity Streamable-HTTP MCP:
@@ -87,9 +87,11 @@ async function forwardMcpLine(jsonLine, options = {}) {
   const budget = options.budget || process.env.INGRAVITY_AGENT_BUDGET;
   const receiptToken = options.receiptToken || process.env.INGRAVITY_RECEIPT_TOKEN;
   const paymentSig = options.paymentSignature || process.env.INGRAVITY_PAYMENT_SIGNATURE;
+  const capitalAtRisk = options.capitalAtRiskUsd || process.env.INGRAVITY_CAPITAL_AT_RISK_USD;
   if (budget) headers["X-Agent-Budget"] = String(budget);
   if (receiptToken) headers["X-Ingravity-Receipt-Token"] = String(receiptToken);
   if (paymentSig) headers["PAYMENT-SIGNATURE"] = String(paymentSig);
+  if (capitalAtRisk) headers["X-Capital-At-Risk-Usd"] = String(capitalAtRisk);
 
   try {
     const res = await postJsonRaw(endpointUrl, trimmed, headers, options.timeoutMs || 12000);
@@ -105,6 +107,19 @@ async function forwardMcpLine(jsonLine, options = {}) {
       const parsedResp = JSON.parse(rawBody);
       return JSON.stringify(parsedResp);
     } catch (_) {
+      if (res.contentType.includes("text/event-stream") || /^data:/m.test(rawBody)) {
+        const dataLines = rawBody
+          .split(/\r?\n/)
+          .filter((l) => l.startsWith("data:"))
+          .map((l) => l.slice(5).trim())
+          .filter((l) => l && l !== "[DONE]");
+        for (let i = dataLines.length - 1; i >= 0; i--) {
+          try {
+            const parsedSse = JSON.parse(dataLines[i]);
+            return JSON.stringify(parsedSse);
+          } catch (_) {}
+        }
+      }
       return makeJsonRpcError(reqId, -32603, `Non-JSON response from MCP server (HTTP ${res.status})`, rawBody.slice(0, 300));
     }
   } catch (err) {
