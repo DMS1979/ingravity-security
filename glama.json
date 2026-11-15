@@ -1,18 +1,26 @@
 {
   "$schema": "https://glama.ai/mcp/schemas/server.json",
   "name": "ingravity-evm-security-mcp",
-  "description": "Ingravity v3.10.0: Deterministic EVM pre-flight transaction firewall ($0.10 USDC), ultra-fast binary SAFE/DANGER address ping ($0.03 USDC), live Base RPC token honeypot scanner by tokenAddress ($0.50/$0.25 USDC), 24-rule Solidity auditor & EIP-5792 Safe-Harbor rescue on Base Mainnet (x402 v2 USDC | STDIO bridge: ingravity-security@1.2.0).",
+  "description": "Ingravity Swarm v3.13.0 (SDK v1.3.0): 5-EVM pre-flight transaction firewall ($0.10 USDC), $0.01 binary SAFE/DANGER Fast-Ping, live RPC token honeypot scanner by tokenAddress ($0.04 Signal / $0.12 Full USDC), BigInt DeFi MEV guard ($0.04/$0.10 USDC), 24-vector Solidity auditor & EIP-5792 Safe-Harbor rescue on Base Mainnet (x402 v2 USDC | STDIO bridge: ingravity-security@1.3.0).",
   "maintainers": [
     "DMS1979"
   ],
   "endpoints": {
     "streamableHttp": "https://red-shape-1b3b.daviddelmoral79.workers.dev/mcp",
     "serverCard": "https://red-shape-1b3b.daviddelmoral79.workers.dev/.well-known/mcp/server-card.json",
-    "openApi": "https://red-shape-1b3b.daviddelmoral79.workers.dev/openapi.json"
+    "openApi": "https://red-shape-1b3b.daviddelmoral79.workers.dev/openapi.json",
+    "agentsMd": "https://red-shape-1b3b.daviddelmoral79.workers.dev/agents.md"
   },
   "payment": {
     "protocol": "x402-v2",
     "network": "eip155:8453",
+    "supportedNetworks": [
+      "eip155:8453",
+      "eip155:42161",
+      "eip155:10",
+      "eip155:137",
+      "eip155:1"
+    ],
     "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
     "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
     "builderCode": "bc_i26d7owr"

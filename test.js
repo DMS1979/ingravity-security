@@ -57,33 +57,39 @@ const k1 = provider._computeCacheKey("/api/v1/tx-firewall", { ticketId: "TICKET-
 const k2 = provider._computeCacheKey("/api/v1/tx-firewall?ticketId=TICKET-8453-ABCD1234", { ticketId: "ticket-8453-abcd1234" });
 assert.strictEqual(k1, k2, "Receipt cache key should normalize ticketId & route pathname");
 
-// Glama ownership claim persistence regression guard (must stay unauthenticated, redirect-free & before MCP/x402)
+// Glama ownership claim persistence regression guard (runs full workspace checks when parent monorepo files exist)
 const glamaJsonPath = path.join(__dirname, "..", "glama.json");
-const glamaDoc = JSON.parse(fs.readFileSync(glamaJsonPath, "utf8"));
-assert.deepStrictEqual(Object.keys(glamaDoc).sort(), ["$schema", "claim"], "glama.json must expose strictly $schema and claim");
-assert.strictEqual(glamaDoc.$schema, "https://glama.ai/mcp/schemas/connector.json");
-assert.strictEqual(glamaDoc.claim, "glama_claim_pjiva77l14yvBRsvuPceWrW_WkeG3pCY");
+const workerPath = path.join(__dirname, "..", "worker_x402_autonomo.js");
+if (fs.existsSync(glamaJsonPath) && fs.existsSync(workerPath)) {
+  const glamaDoc = JSON.parse(fs.readFileSync(glamaJsonPath, "utf8"));
+  assert.deepStrictEqual(Object.keys(glamaDoc).sort(), ["$schema", "claim"], "glama.json must expose strictly $schema and claim");
+  assert.strictEqual(glamaDoc.$schema, "https://glama.ai/mcp/schemas/connector.json");
+  assert.strictEqual(glamaDoc.claim, "glama_claim_pjiva77l14yvBRsvuPceWrW_WkeG3pCY");
 
-const workerSrc = fs.readFileSync(path.join(__dirname, "..", "worker_x402_autonomo.js"), "utf8");
-assert.ok(workerSrc.includes("const GLAMA_OWNERSHIP_CLAIM = Object.freeze("), "GLAMA_OWNERSHIP_CLAIM must remain frozen at top level");
-assert.ok(workerSrc.includes(glamaDoc.claim), "Worker must retain verified Glama ownership claim token");
-const fetchStart = workerSrc.indexOf("async function handleFetchRequest(");
-const claimIdx = workerSrc.indexOf('"/mcp/.well-known/glama.json"', fetchStart);
-const rootClaimIdx = workerSrc.indexOf('"/.well-known/glama.json"', fetchStart);
-const internalSyncIdx = workerSrc.indexOf('"/api/v1/internal/sync-vault"', fetchStart);
-const mcpIdx = workerSrc.indexOf('url.pathname === "/mcp"', fetchStart);
-assert.ok(fetchStart > 0 && claimIdx > fetchStart && rootClaimIdx > fetchStart, "Both Glama verification paths must be routed in handleFetchRequest");
-assert.ok(claimIdx < internalSyncIdx && claimIdx < mcpIdx, "Glama ownership claim must execute BEFORE auth-gated internal routes, /mcp, and x402 paywalls");
+  const workerSrc = fs.readFileSync(workerPath, "utf8");
+  assert.ok(workerSrc.includes("const GLAMA_OWNERSHIP_CLAIM = Object.freeze("), "GLAMA_OWNERSHIP_CLAIM must remain frozen at top level");
+  assert.ok(workerSrc.includes(glamaDoc.claim), "Worker must retain verified Glama ownership claim token");
+  const fetchStart = workerSrc.indexOf("async function handleFetchRequest(");
+  const claimIdx = workerSrc.indexOf('"/mcp/.well-known/glama.json"', fetchStart);
+  const rootClaimIdx = workerSrc.indexOf('"/.well-known/glama.json"', fetchStart);
+  const internalSyncIdx = workerSrc.indexOf('"/api/v1/internal/sync-vault"', fetchStart);
+  const mcpIdx = workerSrc.indexOf('url.pathname === "/mcp"', fetchStart);
+  assert.ok(fetchStart > 0 && claimIdx > fetchStart && rootClaimIdx > fetchStart, "Both Glama verification paths must be routed in handleFetchRequest");
+  assert.ok(claimIdx < internalSyncIdx && claimIdx < mcpIdx, "Glama ownership claim must execute BEFORE auth-gated internal routes, /mcp, and x402 paywalls");
 
-// Compact PAYMENT-REQUIRED HTTP header & v3.13.0 Swarm conversion guards
-assert.ok(workerSrc.includes('const SWARM_VERSION = "3.13.0"'), "Worker must declare SWARM_VERSION = 3.13.0");
-assert.ok(workerSrc.includes('usdPrice: "0.01"') && (workerSrc.includes('atomicAmount: "10000"') || workerSrc.includes('amount: "10000"')), "Fast-Ping must use $0.01 (10000 atomic USDC)");
-assert.ok(workerSrc.includes("function normalizeCaip2Network("), "Worker must normalize CAIP-2 network aliases to eip155:8453");
-assert.ok(workerSrc.includes("function encodeCompactPaymentRequiredHeader("), "Worker must define encodeCompactPaymentRequiredHeader helper");
-assert.ok(workerSrc.includes("maxB64Len = 6400") && workerSrc.includes("level = 0") && workerSrc.includes("level === 1"), "Compact header encoder must attempt exact level=0 up to 6400 chars and preserve accepts at level=1");
-assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(paymentRequiredV2))"), "HTTP /api/v1/* must use encodeCompactPaymentRequiredHeader, not raw full paymentRequiredV2");
-assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(paymentRequiredA2A))"), "A2A /a2a must use encodeCompactPaymentRequiredHeader, not raw full paymentRequiredA2A");
-assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(challenge))"), "Deprecated quick-check must use encodeCompactPaymentRequiredHeader");
+  assert.ok(workerSrc.includes('const SWARM_VERSION = "3.13.0"'), "Worker must declare SWARM_VERSION = 3.13.0");
+  assert.ok(workerSrc.includes('usdPrice: "0.01"') && (workerSrc.includes('atomicAmount: "10000"') || workerSrc.includes('amount: "10000"')), "Fast-Ping must use $0.01 (10000 atomic USDC)");
+  assert.ok(workerSrc.includes("function normalizeCaip2Network("), "Worker must normalize CAIP-2 network aliases to eip155:8453");
+  assert.ok(workerSrc.includes("function encodeCompactPaymentRequiredHeader("), "Worker must define encodeCompactPaymentRequiredHeader helper");
+  assert.ok(workerSrc.includes("maxB64Len = 6400") && workerSrc.includes("level = 0") && workerSrc.includes("level === 1"), "Compact header encoder must attempt exact level=0 up to 6400 chars and preserve accepts at level=1");
+  assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(paymentRequiredV2))"), "HTTP /api/v1/* must use encodeCompactPaymentRequiredHeader, not raw full paymentRequiredV2");
+  assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(paymentRequiredA2A))"), "A2A /a2a must use encodeCompactPaymentRequiredHeader, not raw full paymentRequiredA2A");
+  assert.ok(!workerSrc.includes("utf8ToB64(JSON.stringify(challenge))"), "Deprecated quick-check must use encodeCompactPaymentRequiredHeader");
+} else {
+  const localGlama = JSON.parse(fs.readFileSync(path.join(__dirname, "glama.json"), "utf8"));
+  assert.strictEqual(localGlama.name, "ingravity-evm-security-mcp");
+  assert.strictEqual(localGlama.payment.payTo, "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f");
+}
 
-console.log(`[TEST PASSED] v${SDK_VERSION}: ${actions.length} paid actions ($0.01 Fast-Ping), ${ingravityElizaPlugin.actions.length} Eliza actions, ERC-8021 helper, x402 v2 sanitizer, MCP STDIO bridge, immutable Glama claim & v3.13.0 guards verified.`);
+console.log(`[TEST PASSED] v${SDK_VERSION} (Swarm v3.13.0): ${actions.length} paid actions ($0.01 Fast-Ping, $0.04/$0.12 Token Scanner, $0.04/$0.10 MEV Math), ${ingravityElizaPlugin.actions.length} Eliza actions, ERC-8021 helper, x402 v2 sanitizer & MCP STDIO bridge verified.`);
 process.exit(0);

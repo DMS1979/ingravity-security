@@ -1,0 +1,2689 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Ingravity Autonomous EVM Security & DeFi Intelligence Swarm",
+    "version": "3.13.0",
+    "description": "v3.13.0 Multichain (5 EVM: Base, Arbitrum, Optimism, Polygon, Ethereum) Autonomous Web3 Security Swarm: $0.01 binary Fast-Ping + $0.04-$0.12 Token Honeypot & MEV Math + Services 2-7 ($0.04-$45.00 floor plus +0.15% Pre-Flight SLA & 5%-10% Whitehat Safe-Harbor Rescue Bounty on saved capital with Anti-Bypass Seal on CRITICAL/HIGH remediation patches), settled per call via x402 v2 (USDC on Base).",
+    "contact": {
+      "name": "David del Moral — Founder & Lead Security Researcher",
+      "email": "daviddelmoral79@gmail.com",
+      "url": "https://github.com/DMS1979/ingravity-security"
+    },
+    "x-agents-md": "https://red-shape-1b3b.daviddelmoral79.workers.dev/agents.md",
+    "x-provenance": {
+      "githubRepo": "https://github.com/DMS1979/ingravity-security",
+      "erc8004AgentId": 10252,
+      "erc8004RegistryUrl": "https://www.8004scan.io/agents/base/10252",
+      "treasuryBaseScan": "https://basescan.org/address/0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f#tokentxns"
+    },
+    "x-pricing-catalog": {
+      "model": "Hybrid M2M (Base Floor + 0.15% Pre-Flight SLA & 5%-10% Safe-Harbor Rescue Bounty · Anti-Bypass Seal Services 2-7)",
+      "supportedNetworks": [
+        "eip155:1",
+        "eip155:10",
+        "eip155:137",
+        "eip155:8453",
+        "eip155:42161"
+      ],
+      "settlementAsset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "beneficiaryWallet": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+      "network": "Base Mainnet (eip155:8453)",
+      "services": [
+        {
+          "path": "/api/v1/fast-ping",
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "baseFloorUsd": "$0.01 USDC",
+          "signalOnlyUsd": "$0.01 USDC",
+          "proportionalRateOverCapital": "Flat $0.01 Binary SAFE/DANGER Only (No Forensics)",
+          "antiBypassSeal": false,
+          "summary": "$0.01 USDC Instant Token Honeypot, Rugpull & Address Safety Check Before Swapping (Binary SAFE/DANGER, GET/POST)"
+        },
+        {
+          "path": "/api/v1/audit-solidity",
+          "methods": [
+            "POST"
+          ],
+          "baseFloorUsd": "$0.85 USDC",
+          "signalOnlyUsd": "$0.35 USDC",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre vulnerabilidad/TVL salvado (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "Deterministic 24-Vector Solidity Audit & Safe-Harbor Guard ($0.85 Floor / $0.35 Signal + 0.15% SLA / 5%-10% Rescue, Anti-Bypass)"
+        },
+        {
+          "path": "/api/v1/tx-firewall",
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "baseFloorUsd": "$0.10 USDC",
+          "signalOnlyUsd": "$0.10 USDC",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight | 5%-10% Rescate Safe-Harbor sobre capital salvado (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "Pre-Flight EVM Firewall & Live 5-EVM RPC Forensics ($0.10 Floor + 0.15% Pre-Flight / 5%-10% Safe-Harbor Rescue, Anti-Bypass)"
+        },
+        {
+          "path": "/api/v1/defi-math-guard",
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "baseFloorUsd": "$0.10 USDC",
+          "signalOnlyUsd": "$0.04 USDC",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Swap | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "Exact BigInt AMM Slippage, MEV Sandwich & Liquidation Guard ($0.10 Floor / $0.04 Signal + 0.15% Swap / 5%-10% Rescue, Anti-Bypass)"
+        },
+        {
+          "path": "/api/v1/token-rug-scanner",
+          "methods": [
+            "GET",
+            "POST"
+          ],
+          "baseFloorUsd": "$0.12 USDC",
+          "signalOnlyUsd": "$0.04 USDC",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Posición | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "5-EVM Token Honeypot & Bytecode/Proxy Forensics ($0.12 Full / $0.04 Signal + 0.15% Position / 5%-10% Rescue, Anti-Bypass, GET/POST)"
+        },
+        {
+          "path": "/api/v1/protocol-dossier",
+          "methods": [
+            "POST"
+          ],
+          "baseFloorUsd": "$12.00 USDC",
+          "signalOnlyUsd": "$3.50 USDC",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre TVL salvado (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "Multi-Contract DeFi Protocol Dossier & Invariant Engine ($12.00 Floor / $3.50 Signal + 0.15% SLA / 5%-10% Rescue, Anti-Bypass)"
+        },
+        {
+          "path": "/api/v1/deep-exploit-bounty",
+          "methods": [
+            "POST"
+          ],
+          "baseFloorUsd": "$45.00 USDC",
+          "signalOnlyUsd": "$9.50 USDC",
+          "proportionalRateOverCapital": "5%-10% Atomic EIP-5792 / Sequential EOA Safe-Harbor Rescue Split on Rescued Capital (Anti-Bypass)",
+          "antiBypassSeal": true,
+          "summary": "Institutional Flash-Loan Simulation & Atomic Safe-Harbor Rescue ($45.00 Floor / $9.50 Triage + 5%-10% Rescue Split, Anti-Bypass)"
+        }
+      ]
+    },
+    "x-settlement": {
+      "network": "eip155:8453",
+      "supportedNetworks": [
+        "eip155:1",
+        "eip155:10",
+        "eip155:137",
+        "eip155:8453",
+        "eip155:42161"
+      ],
+      "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+      "baseBuilderCode": "bc_i26d7owr"
+    },
+    "x-guidance": "Call GET (query params on fast-ping, token-rug-scanner, tx-firewall, defi-math-guard) or POST JSON to any endpoint: /api/v1/fast-ping (Base: $0.01 + Flat $0.01 Binary SAFE/DANGER Only (No Forensics) / Signal: $0.01), /api/v1/audit-solidity (Base: $0.85 + +0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre vulnerabilidad/TVL salvado (Anti-Bypass) / Signal: $0.35), /api/v1/tx-firewall (Base: $0.10 + +0.15% Pre-Flight | 5%-10% Rescate Safe-Harbor sobre capital salvado (Anti-Bypass) / Signal: $0.10), /api/v1/defi-math-guard (Base: $0.10 + +0.15% Pre-Flight Swap | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass) / Signal: $0.04), /api/v1/token-rug-scanner (Base: $0.12 + +0.15% Pre-Flight Posición | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass) / Signal: $0.04), /api/v1/protocol-dossier (Base: $12.00 + +0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre TVL salvado (Anti-Bypass) / Signal: $3.50), /api/v1/deep-exploit-bounty (Base: $45.00 + 5%-10% Atomic EIP-5792 / Sequential EOA Safe-Harbor Rescue Split on Rescued Capital (Anti-Bypass) / Signal: $9.50). Pass header 'X-Agent-Budget: <usd>' to auto-select Signal Only tier or auto-cap fee. See https://red-shape-1b3b.daviddelmoral79.workers.dev/agents.md for examples. Settlement: x402 v2 USDC on Base (eip155:8453) to 0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f."
+  },
+  "servers": [
+    {
+      "url": "https://red-shape-1b3b.daviddelmoral79.workers.dev"
+    }
+  ],
+  "paths": {
+    "/api/v1/fast-ping": {
+      "get": {
+        "operationId": "fastPingAddressSafetyGet",
+        "tags": [
+          "Honeypot Check",
+          "Token Safety",
+          "Rugpull Check",
+          "Anti-Drainer",
+          "Pre-Swap Check",
+          "Fast Ping",
+          "Base x402"
+        ],
+        "summary": "$0.01 USDC Instant Token Honeypot, Rugpull & Address Safety Check Before Swapping (Binary SAFE/DANGER, GET/POST)",
+        "description": "Designed for high-frequency trading bots and autonomous agents (maxAutoPay <= $0.05 USDC). Supports both HTTP GET (?address=0x...&chainId=8453) and POST JSON to check any ERC-20 tokenAddress or spender for honeypot traps and drainers before swapping across 5 EVM chains (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) with zero forensic leakage. Upgrade to GET/POST /api/v1/token-rug-scanner ($0.04 Signal / $0.12 Full) or /api/v1/tx-firewall ($0.10 USDC) for sell-simulation & Safe-Harbor calldata. Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+            },
+            "description": "42-char EVM token or contract address (0x...) to evaluate before swapping or signing."
+          },
+          {
+            "name": "chainId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                8453,
+                42161,
+                10,
+                137,
+                1
+              ],
+              "default": 8453
+            },
+            "description": "Target EVM chain ID (default 8453 Base Mainnet)."
+          },
+          {
+            "name": "trialToken",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional single-use onboarding calibration token (locked to canonical Base USDC canary)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "DANGER",
+                        "UNKNOWN_UNVERIFIED_RPC"
+                      ],
+                      "description": "Binary address risk classification."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "DANGER",
+                        "UNKNOWN_UNVERIFIED_RPC"
+                      ],
+                      "description": "Mirror of status for downstream routing."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "ABORT",
+                        "CAUTION"
+                      ],
+                      "description": "Recommended execution directive."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "RED_LIGHT",
+                        "YELLOW_LIGHT"
+                      ],
+                      "description": "Traffic-light risk indicator."
+                    },
+                    "isSafe": {
+                      "type": "boolean",
+                      "description": "True only when address passed deterministic and live RPC checks."
+                    },
+                    "targetAddress": {
+                      "type": "string",
+                      "description": "Normalized lowercase address evaluated."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID used for evaluation."
+                    },
+                    "forensicDetails": {
+                      "type": "string",
+                      "description": "Fixed sentinel ('LOCKED_IN_FAST_PING_TIER'); upgrade to tx-firewall for forensics."
+                    },
+                    "upgradeForFullForensics": {
+                      "type": "string",
+                      "description": "Upgrade paths for calldata or token forensics."
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "status",
+                    "verdict",
+                    "action",
+                    "signal",
+                    "isSafe",
+                    "targetAddress",
+                    "chainId",
+                    "forensicDetails"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "status": "SAFE",
+                  "verdict": "SAFE",
+                  "action": "PROCEED",
+                  "signal": "GREEN_LIGHT",
+                  "isSafe": true,
+                  "targetAddress": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+                  "chainId": 8453,
+                  "forensicDetails": "LOCKED_IN_FAST_PING_TIER"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.01 USDC / Signal $0.01 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.01"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.01",
+          "essentialSignalOnlyAmount": "0.01",
+          "proportionalRateOverCapital": "Flat $0.01 Binary SAFE/DANGER Only (No Forensics)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      },
+      "post": {
+        "operationId": "fastPingAddressSafety",
+        "tags": [
+          "Honeypot Check",
+          "Token Safety",
+          "Rugpull Check",
+          "Anti-Drainer",
+          "Pre-Swap Check",
+          "Fast Ping",
+          "Base x402"
+        ],
+        "summary": "$0.01 USDC Instant Token Honeypot, Rugpull & Address Safety Check Before Swapping (Binary SAFE/DANGER, GET/POST)",
+        "description": "Designed for high-frequency trading bots and autonomous agents (maxAutoPay <= $0.05 USDC). Supports both HTTP GET (?address=0x...&chainId=8453) and POST JSON to check any ERC-20 tokenAddress or spender for honeypot traps and drainers before swapping across 5 EVM chains (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) with zero forensic leakage. Upgrade to GET/POST /api/v1/token-rug-scanner ($0.04 Signal / $0.12 Full) or /api/v1/tx-firewall ($0.10 USDC) for sell-simulation & Safe-Harbor calldata.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "address": {
+                    "type": "string",
+                    "description": "42-character EVM contract, token, or spender address (0x...) across Base, Arbitrum, Optimism, Polygon, or Ethereum."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "Target EVM chain ID: 8453 (Base), 42161 (Arbitrum), 10 (Optimism), 137 (Polygon), or 1 (Ethereum). Unsupported values fall back to 8453."
+                  }
+                },
+                "required": [
+                  "address"
+                ]
+              },
+              "example": {
+                "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "chainId": 8453
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "DANGER",
+                        "UNKNOWN_UNVERIFIED_RPC"
+                      ],
+                      "description": "Binary address risk classification."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "DANGER",
+                        "UNKNOWN_UNVERIFIED_RPC"
+                      ],
+                      "description": "Mirror of status for downstream routing."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "ABORT",
+                        "CAUTION"
+                      ],
+                      "description": "Recommended execution directive."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "RED_LIGHT",
+                        "YELLOW_LIGHT"
+                      ],
+                      "description": "Traffic-light risk indicator."
+                    },
+                    "isSafe": {
+                      "type": "boolean",
+                      "description": "True only when address passed deterministic and live RPC checks."
+                    },
+                    "targetAddress": {
+                      "type": "string",
+                      "description": "Normalized lowercase address evaluated."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID used for evaluation."
+                    },
+                    "forensicDetails": {
+                      "type": "string",
+                      "description": "Fixed sentinel ('LOCKED_IN_FAST_PING_TIER'); upgrade to tx-firewall for forensics."
+                    },
+                    "upgradeForFullForensics": {
+                      "type": "string",
+                      "description": "Upgrade paths for calldata or token forensics."
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "status",
+                    "verdict",
+                    "action",
+                    "signal",
+                    "isSafe",
+                    "targetAddress",
+                    "chainId",
+                    "forensicDetails"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "status": "SAFE",
+                  "verdict": "SAFE",
+                  "action": "PROCEED",
+                  "signal": "GREEN_LIGHT",
+                  "isSafe": true,
+                  "targetAddress": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+                  "chainId": 8453,
+                  "forensicDetails": "LOCKED_IN_FAST_PING_TIER"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.01 USDC / Signal $0.01 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.01"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.01",
+          "essentialSignalOnlyAmount": "0.01",
+          "proportionalRateOverCapital": "Flat $0.01 Binary SAFE/DANGER Only (No Forensics)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/audit-solidity": {
+      "post": {
+        "operationId": "auditSolidityContract",
+        "tags": [
+          "Solidity Security",
+          "Smart Contract Audit",
+          "ERC-4626",
+          "24 SWC Vectors"
+        ],
+        "summary": "Deterministic 24-Vector Solidity Audit & Safe-Harbor Guard ($0.85 Floor / $0.35 Signal + 0.15% SLA / 5%-10% Rescue, Anti-Bypass)",
+        "description": "Deterministic O(N) lexical sanitization + 4-Gate Institutional Anti-Rejection Filter (excludes sub-unit dust rounding & trusted-admin paths) covering 24 SWC/DeFi attack vectors across 5 EVM chains. Base $0.85 USDC ($0.35 Signal) confirms vulnerability verdict & severity; Anti-Bypass Seal keeps exact line coordinates & remediation patches for CRITICAL/HIGH exploits sealed behind the +0.15% SLA or 5%-10% Atomic Safe-Harbor rescue split (90%-95% to owner treasury, 5%-10% whitehat bounty on saved capital).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "description": "Raw Solidity (.sol) smart contract source code to audit across 24 SWC/DeFi rules (non-empty string required)."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "EVM Chain ID used only when contractAddress is supplied for live TVL verification (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; unknown falls back to 8453)."
+                  },
+                  "contractName": {
+                    "type": "string",
+                    "default": "Contract.sol",
+                    "description": "Optional contract identifier or filename echoed in the report."
+                  },
+                  "contractAddress": {
+                    "type": "string",
+                    "description": "Optional deployed EVM contract address (0x...) on chainId to verify live TVL via RPC and generate unsigned Safe-Harbor rescue calldata."
+                  },
+                  "ownerTreasury": {
+                    "type": "string",
+                    "description": "Optional protocol owner/multisig recipient (0x...) designated to receive 90%-95% of rescued capital in generated unsigned calldata."
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "FULL",
+                      "ESSENTIAL"
+                    ],
+                    "default": "FULL",
+                    "description": "Billing & output depth: FULL ($0.85 USDC) includes findings and Safe-Harbor calldata (subject to Anti-Bypass sealing on CRITICAL/HIGH until proportional settlement); ESSENTIAL ($0.35 USDC) returns score, grade, status, and severity counts only."
+                  }
+                },
+                "required": [
+                  "code"
+                ]
+              },
+              "example": {
+                "code": "pragma solidity ^0.8.20; contract Vault { mapping(address => uint256) public bal; function withdraw(uint256 a) external { (bool ok,) = msg.sender.call{value: a}(\"\"); require(ok); bal[msg.sender] -= a; } }",
+                "contractName": "Vault.sol"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Deployment gate directive."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light severity indicator."
+                    },
+                    "contractName": {
+                      "type": "string",
+                      "description": "Audited contract label."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID."
+                    },
+                    "loc": {
+                      "type": "integer",
+                      "description": "Source lines of code analyzed."
+                    },
+                    "securityScore": {
+                      "type": "number",
+                      "description": "Deterministic security score from 0 to 100."
+                    },
+                    "grade": {
+                      "type": "string",
+                      "enum": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "F"
+                      ],
+                      "description": "Letter grade derived from securityScore."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "PRODUCTION_READY",
+                        "ACCEPTABLE_WITH_WARNINGS",
+                        "REMEDIATION_REQUIRED",
+                        "CRITICAL_DO_NOT_DEPLOY"
+                      ],
+                      "description": "Overall readiness verdict."
+                    },
+                    "verifiedOnChainTvlUsd": {
+                      "type": "number",
+                      "description": "Live on-chain TVL verified via RPC when contractAddress is supplied (0 otherwise)."
+                    },
+                    "savedCapitalEstimateUsd": {
+                      "type": "string",
+                      "description": "Estimated capital at risk or prevented exploit range."
+                    },
+                    "summary": {
+                      "type": "object",
+                      "description": "Finding counts grouped by severity.",
+                      "properties": {
+                        "CRITICAL": {
+                          "type": "integer"
+                        },
+                        "HIGH": {
+                          "type": "integer"
+                        },
+                        "MEDIUM": {
+                          "type": "integer"
+                        },
+                        "LOW": {
+                          "type": "integer"
+                        },
+                        "GAS": {
+                          "type": "integer"
+                        },
+                        "total": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "CRITICAL",
+                        "HIGH",
+                        "MEDIUM",
+                        "LOW",
+                        "GAS",
+                        "total"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "findings": {
+                      "type": "array",
+                      "description": "Per-finding details with line coordinates and fix guidance (FULL tier only; CRITICAL/HIGH coordinates sealed until proportional settlement when applicable).",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "capitalSalvageAndSafeHarbor": {
+                      "type": "object",
+                      "description": "Unsigned Safe-Harbor rescue plan or optional pre-deploy circuit-breaker snippet (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "proportionalRescueCommissionPolicy": {
+                      "type": "object",
+                      "description": "0.15% Pre-Flight SLA and 5%-10% Safe-Harbor policy metadata (FULL tier only).",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "contractName",
+                    "chainId",
+                    "loc",
+                    "securityScore",
+                    "grade",
+                    "status",
+                    "verifiedOnChainTvlUsd",
+                    "savedCapitalEstimateUsd",
+                    "summary"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "contractName": "Vault.sol",
+                  "securityScore": 49,
+                  "grade": "D",
+                  "status": "CRITICAL_DO_NOT_DEPLOY",
+                  "summary": {
+                    "CRITICAL": 1,
+                    "HIGH": 0,
+                    "MEDIUM": 0,
+                    "LOW": 1,
+                    "GAS": 0,
+                    "total": 2
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.85 USDC / Signal $0.35 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.35",
+            "max": "0.85"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.85",
+          "essentialSignalOnlyAmount": "0.35",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre vulnerabilidad/TVL salvado (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/tx-firewall": {
+      "get": {
+        "operationId": "inspectEvmTransactionFirewallGet",
+        "tags": [
+          "EVM Firewall",
+          "Wallet Drainer Protection",
+          "Permit2",
+          "EIP-1967 Storage"
+        ],
+        "summary": "Pre-Flight EVM Firewall & Live 5-EVM RPC Forensics ($0.10 Floor + 0.15% Pre-Flight / 5%-10% Safe-Harbor Rescue, Anti-Bypass)",
+        "description": "Live Multichain EVM RPC inspection (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1: eth_getCode + EIP-1967 storage slots) + Ready-to-sign EIP-5792 / sequential EOA revocation calldata. Hybrid Pricing: $0.10 USDC base floor (<$200 USD), plus +0.15% Pre-Flight protection / 5%-10% Whitehat Safe-Harbor rescue bounty (Anti-Bypass Seal locks compromised spender & rescue calldata on active critical threats until bounty settlement). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
+        "parameters": [
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+            },
+            "description": "Target contract or spender address (0x...) for pre-sign firewall inspection."
+          },
+          {
+            "name": "data",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "0x"
+            },
+            "description": "Hex-encoded transaction calldata (optional, defaults to 0x)."
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional signer wallet address (0x...)."
+          },
+          {
+            "name": "value",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "0"
+            },
+            "description": "Optional native wei value string."
+          },
+          {
+            "name": "chainId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                8453,
+                42161,
+                10,
+                137,
+                1
+              ],
+              "default": 8453
+            },
+            "description": "Target EVM chain ID (default 8453 Base Mainnet)."
+          },
+          {
+            "name": "ticketId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional ZK-EC Safe-Harbor ticket ID (TICKET-8453-...)."
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FULL",
+                "ESSENTIAL"
+              ],
+              "default": "FULL"
+            },
+            "description": "Output tier (FULL $0.10 USDC)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Pre-sign action recommendation."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light risk signal."
+                    },
+                    "decision": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "CAUTION_REQUIRED",
+                        "CRITICAL_RISK"
+                      ],
+                      "description": "Normalized risk decision."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "WARNING",
+                        "BLOCK_DRAINER"
+                      ],
+                      "description": "Detailed firewall classification."
+                    },
+                    "riskScore": {
+                      "type": "number",
+                      "description": "Cumulative risk score from 0 to 100."
+                    },
+                    "selector": {
+                      "type": "string",
+                      "description": "4-byte function selector ('0x' for empty calldata, 'INVALID' if malformed hex)."
+                    },
+                    "decodedAction": {
+                      "type": "string",
+                      "description": "Human-readable decoded calldata action."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID used for live RPC inspection."
+                    },
+                    "savedCapitalEstimateUsd": {
+                      "type": "string",
+                      "description": "Estimated wallet value protected if drainer blocked."
+                    },
+                    "agentDirective": {
+                      "type": "string",
+                      "description": "Execution directive explaining how to proceed or revoke."
+                    },
+                    "decodedParams": {
+                      "type": "object",
+                      "description": "Decoded ABI arguments (e.g., spender, operator, owner, value, deadline).",
+                      "additionalProperties": true
+                    },
+                    "liveOnChainForensics": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Live 5-EVM RPC bytecode and EIP-1967 proxy slot inspection (null when unavailable or malformed).",
+                      "additionalProperties": true
+                    },
+                    "executableRemediationTx": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Unsigned EIP-5792 wallet_sendCalls and approve(spender, 0) calldata when spender is decoded (or lock notice when masked in pre-flight tier).",
+                      "additionalProperties": true
+                    },
+                    "triggers": {
+                      "type": "array",
+                      "description": "Triggered drainer/permission heuristics and RPC checks.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "decision",
+                    "verdict",
+                    "riskScore",
+                    "selector",
+                    "decodedAction",
+                    "chainId",
+                    "savedCapitalEstimateUsd",
+                    "agentDirective",
+                    "triggers"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "verdict": "BLOCK_DRAINER",
+                  "riskScore": 90,
+                  "selector": "0x095ea7b3",
+                  "decodedAction": "ERC20.approve(spender, UNLIMITED)",
+                  "agentDirective": "ABORT_SIGNATURE: Replace infinite approval with exact amount and verify spender."
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.10 USDC / Signal $0.10 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.10"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.10",
+          "essentialSignalOnlyAmount": "0.10",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight | 5%-10% Rescate Safe-Harbor sobre capital salvado (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      },
+      "post": {
+        "operationId": "inspectEvmTransactionFirewall",
+        "tags": [
+          "EVM Firewall",
+          "Wallet Drainer Protection",
+          "Permit2",
+          "EIP-1967 Storage"
+        ],
+        "summary": "Pre-Flight EVM Firewall & Live 5-EVM RPC Forensics ($0.10 Floor + 0.15% Pre-Flight / 5%-10% Safe-Harbor Rescue, Anti-Bypass)",
+        "description": "Live Multichain EVM RPC inspection (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1: eth_getCode + EIP-1967 storage slots) + Ready-to-sign EIP-5792 / sequential EOA revocation calldata. Hybrid Pricing: $0.10 USDC base floor (<$200 USD), plus +0.15% Pre-Flight protection / 5%-10% Whitehat Safe-Harbor rescue bounty (Anti-Bypass Seal locks compromised spender & rescue calldata on active critical threats until bounty settlement).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "description": "Target EVM contract, token, or recipient 42-character hex address (0x...)."
+                  },
+                  "data": {
+                    "type": "string",
+                    "description": "Hexadecimal transaction calldata (0x...); pass '0x' for a plain native ETH transfer."
+                  },
+                  "from": {
+                    "type": "string",
+                    "description": "Optional sender wallet address (0x...) also matched against active ZK-EC whale exposure dossiers."
+                  },
+                  "value": {
+                    "type": "string",
+                    "default": "0",
+                    "description": "Optional native ETH value in wei as a decimal string."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "Target EVM chain ID for live RPC bytecode/EIP-1967 inspection (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; unknown falls back to 8453)."
+                  },
+                  "ticketId": {
+                    "type": "string",
+                    "description": "Optional ZK-EC blinded exposure ticket ID (TICKET-8453-...) to unseal full remediation coordinates upon x402 rescue settlement."
+                  },
+                  "capitalAtRiskUsd": {
+                    "type": "number",
+                    "description": "Optional protected capital value in USD for +0.15% Pre-Flight SLA / Safe-Harbor rescue quoting."
+                  }
+                },
+                "required": [
+                  "to",
+                  "data"
+                ]
+              },
+              "example": {
+                "chainId": 8453,
+                "to": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "value": "0",
+                "data": "0x095ea7b3000000000000000000000000deadbeef00000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Pre-sign action recommendation."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light risk signal."
+                    },
+                    "decision": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "CAUTION_REQUIRED",
+                        "CRITICAL_RISK"
+                      ],
+                      "description": "Normalized risk decision."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "WARNING",
+                        "BLOCK_DRAINER"
+                      ],
+                      "description": "Detailed firewall classification."
+                    },
+                    "riskScore": {
+                      "type": "number",
+                      "description": "Cumulative risk score from 0 to 100."
+                    },
+                    "selector": {
+                      "type": "string",
+                      "description": "4-byte function selector ('0x' for empty calldata, 'INVALID' if malformed hex)."
+                    },
+                    "decodedAction": {
+                      "type": "string",
+                      "description": "Human-readable decoded calldata action."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID used for live RPC inspection."
+                    },
+                    "savedCapitalEstimateUsd": {
+                      "type": "string",
+                      "description": "Estimated wallet value protected if drainer blocked."
+                    },
+                    "agentDirective": {
+                      "type": "string",
+                      "description": "Execution directive explaining how to proceed or revoke."
+                    },
+                    "decodedParams": {
+                      "type": "object",
+                      "description": "Decoded ABI arguments (e.g., spender, operator, owner, value, deadline).",
+                      "additionalProperties": true
+                    },
+                    "liveOnChainForensics": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Live 5-EVM RPC bytecode and EIP-1967 proxy slot inspection (null when unavailable or malformed).",
+                      "additionalProperties": true
+                    },
+                    "executableRemediationTx": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Unsigned EIP-5792 wallet_sendCalls and approve(spender, 0) calldata when spender is decoded (or lock notice when masked in pre-flight tier).",
+                      "additionalProperties": true
+                    },
+                    "triggers": {
+                      "type": "array",
+                      "description": "Triggered drainer/permission heuristics and RPC checks.",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "decision",
+                    "verdict",
+                    "riskScore",
+                    "selector",
+                    "decodedAction",
+                    "chainId",
+                    "savedCapitalEstimateUsd",
+                    "agentDirective",
+                    "triggers"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "verdict": "BLOCK_DRAINER",
+                  "riskScore": 90,
+                  "selector": "0x095ea7b3",
+                  "decodedAction": "ERC20.approve(spender, UNLIMITED)",
+                  "agentDirective": "ABORT_SIGNATURE: Replace infinite approval with exact amount and verify spender."
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.10 USDC / Signal $0.10 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "fixed",
+            "currency": "USD",
+            "amount": "0.10"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.10",
+          "essentialSignalOnlyAmount": "0.10",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight | 5%-10% Rescate Safe-Harbor sobre capital salvado (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/defi-math-guard": {
+      "get": {
+        "operationId": "computeDefiSlippageAndLiquidationGet",
+        "tags": [
+          "DeFi Math",
+          "MEV Sandwich Protection",
+          "AMM Slippage",
+          "BigInt Precision",
+          "Pre-Swap Check"
+        ],
+        "summary": "Exact BigInt AMM Slippage, MEV Sandwich & Liquidation Guard ($0.10 Floor / $0.04 Signal + 0.15% Swap / 5%-10% Rescue, Anti-Bypass)",
+        "description": "48-step exact BigInt binary search for optimal MEV sandwich vectors and mathematically provable minAmountOut (supports GET query params & POST JSON). Hybrid Pricing: $0.10 USDC base floor ($0.04 Signal Only), plus +0.15% Pre-Flight swap protection or 5%-10% Whitehat Safe-Harbor commission on capital rescued from critical MEV/liquidation exposure (Anti-Bypass Seal applies to CRITICAL/HIGH remediation fixes when saving exposed live liquidity). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
+        "parameters": [
+          {
+            "name": "reserveIn",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "500000000000000000000"
+            },
+            "description": "Pool input reserve in atomic base units (required with reserveOut & amountIn for AMM math)."
+          },
+          {
+            "name": "reserveOut",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "1250000000000"
+            },
+            "description": "Pool output reserve in atomic base units."
+          },
+          {
+            "name": "amountIn",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "25000000000000000000"
+            },
+            "description": "Proposed swap input amount in atomic base units."
+          },
+          {
+            "name": "feeBps",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 30
+            },
+            "description": "AMM pool fee in bps (30 = 0.30%)."
+          },
+          {
+            "name": "userSlippageBps",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 100
+            },
+            "description": "Slippage tolerance in bps (100 = 1.00%)."
+          },
+          {
+            "name": "entryPrice",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional perp entry price string for liquidation calculation."
+          },
+          {
+            "name": "leverage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "1"
+            },
+            "description": "Optional perp leverage multiplier string."
+          },
+          {
+            "name": "side",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "LONG",
+                "SHORT"
+              ],
+              "default": "LONG"
+            },
+            "description": "Optional perp direction."
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FULL",
+                "ESSENTIAL"
+              ],
+              "default": "FULL"
+            },
+            "description": "ESSENTIAL ($0.04 USDC) returns PROCEED/ABORT scalars; FULL ($0.10 USDC) returns exact BigInt MEV bounds."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "ABORT_HIGH_MEV_RISK",
+                        "ABORT_CRITICAL_LIQUIDATION_RISK"
+                      ],
+                      "description": "Trade or margin risk gate decision."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light execution signal."
+                    },
+                    "savedCapitalEstimateUsd": {
+                      "type": "string",
+                      "description": "Estimated MEV or liquidation loss avoided."
+                    },
+                    "amm": {
+                      "type": "object",
+                      "description": "Exact BigInt swap metrics and optimal MEV sandwich profitability bounds (FULL tier only, when amm supplied).",
+                      "additionalProperties": true
+                    },
+                    "leverage": {
+                      "type": "object",
+                      "description": "Exact liquidation price, distance-to-liquidation %, and health factor (FULL tier only, when leverage supplied).",
+                      "additionalProperties": true
+                    },
+                    "proportionalRescueCommissionPolicy": {
+                      "type": "object",
+                      "description": "0.15% Pre-Flight swap and 5%-10% Safe-Harbor terms (FULL tier only).",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "savedCapitalEstimateUsd"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "amm": {
+                    "exactAmountOut": "59362905626",
+                    "purePriceImpactBps": 473,
+                    "mevRisk": "CRITICAL",
+                    "recommendedSlippageBps": 25
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.10 USDC / Signal $0.04 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.04",
+            "max": "0.10"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.10",
+          "essentialSignalOnlyAmount": "0.04",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Swap | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      },
+      "post": {
+        "operationId": "computeDefiSlippageAndLiquidation",
+        "tags": [
+          "DeFi Math",
+          "MEV Sandwich Protection",
+          "AMM Slippage",
+          "BigInt Precision",
+          "Pre-Swap Check"
+        ],
+        "summary": "Exact BigInt AMM Slippage, MEV Sandwich & Liquidation Guard ($0.10 Floor / $0.04 Signal + 0.15% Swap / 5%-10% Rescue, Anti-Bypass)",
+        "description": "48-step exact BigInt binary search for optimal MEV sandwich vectors and mathematically provable minAmountOut (supports GET query params & POST JSON). Hybrid Pricing: $0.10 USDC base floor ($0.04 Signal Only), plus +0.15% Pre-Flight swap protection or 5%-10% Whitehat Safe-Harbor commission on capital rescued from critical MEV/liquidation exposure (Anti-Bypass Seal applies to CRITICAL/HIGH remediation fixes when saving exposed live liquidity).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amm": {
+                    "type": "object",
+                    "description": "Optional constant-product AMM swap parameters (reserveIn, reserveOut, amountIn required when included; evaluated independently of leverage; supply amm, leverage, or both).",
+                    "properties": {
+                      "reserveIn": {
+                        "type": "string",
+                        "description": "Pool input token reserve in atomic base units as a positive integer string (> 0)."
+                      },
+                      "reserveOut": {
+                        "type": "string",
+                        "description": "Pool output token reserve in atomic base units as a positive integer string (> 0)."
+                      },
+                      "amountIn": {
+                        "type": "string",
+                        "description": "Proposed swap input amount in atomic base units as a positive integer string (> 0)."
+                      },
+                      "feeBps": {
+                        "type": "integer",
+                        "default": 30,
+                        "minimum": 0,
+                        "maximum": 9999,
+                        "description": "Pool fee in basis points (0-9999; 30 = 0.30%)."
+                      },
+                      "userSlippageBps": {
+                        "type": "integer",
+                        "default": 100,
+                        "minimum": 0,
+                        "maximum": 9999,
+                        "description": "Proposed slippage tolerance in basis points (0-9999; 100 = 1.00%)."
+                      },
+                      "estimatedSandwichGasInTokenIn": {
+                        "type": "string",
+                        "default": "0",
+                        "description": "Optional attacker gas cost in input token atomic units (>= 0) used to filter unprofitable sandwich attacks."
+                      }
+                    },
+                    "required": [
+                      "reserveIn",
+                      "reserveOut",
+                      "amountIn"
+                    ]
+                  },
+                  "leverage": {
+                    "type": "object",
+                    "description": "Optional perpetual/margin position parameters for exact liquidation price and initial health factor (entryPrice required when included; evaluated independently of amm).",
+                    "properties": {
+                      "entryPrice": {
+                        "type": "string",
+                        "description": "Position entry price as a positive decimal string with up to 18 decimals (e.g., '2500.00')."
+                      },
+                      "leverage": {
+                        "type": "string",
+                        "default": "1",
+                        "description": "Leverage multiplier as a decimal string between '1' and '1000' (e.g., '10')."
+                      },
+                      "side": {
+                        "type": "string",
+                        "enum": [
+                          "LONG",
+                          "SHORT"
+                        ],
+                        "default": "LONG",
+                        "description": "Position direction: LONG or SHORT."
+                      },
+                      "maintenanceMarginBps": {
+                        "type": "integer",
+                        "default": 50,
+                        "minimum": 0,
+                        "maximum": 9999,
+                        "description": "Maintenance margin threshold in basis points (0-9999; 50 = 0.50%)."
+                      },
+                      "feeBufferBps": {
+                        "type": "integer",
+                        "default": 10,
+                        "minimum": 0,
+                        "maximum": 9999,
+                        "description": "Fee buffer in basis points deducted from initial margin (0-9999; 10 = 0.10%)."
+                      }
+                    },
+                    "required": [
+                      "entryPrice"
+                    ]
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "FULL",
+                      "ESSENTIAL"
+                    ],
+                    "default": "FULL",
+                    "description": "Billing & output depth: FULL ($0.10 USDC) returns exact amm and leverage structures; ESSENTIAL ($0.04 USDC) returns top-level action, signal, and savedCapitalEstimateUsd only."
+                  }
+                }
+              },
+              "example": {
+                "amm": {
+                  "reserveIn": "500000000000000000000",
+                  "reserveOut": "1250000000000",
+                  "amountIn": "25000000000000000000",
+                  "feeBps": 30,
+                  "userSlippageBps": 100
+                },
+                "leverage": {
+                  "entryPrice": "2500.00",
+                  "leverage": "10",
+                  "side": "LONG",
+                  "maintenanceMarginBps": 50
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "ABORT_HIGH_MEV_RISK",
+                        "ABORT_CRITICAL_LIQUIDATION_RISK"
+                      ],
+                      "description": "Trade or margin risk gate decision."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light execution signal."
+                    },
+                    "savedCapitalEstimateUsd": {
+                      "type": "string",
+                      "description": "Estimated MEV or liquidation loss avoided."
+                    },
+                    "amm": {
+                      "type": "object",
+                      "description": "Exact BigInt swap metrics and optimal MEV sandwich profitability bounds (FULL tier only, when amm supplied).",
+                      "additionalProperties": true
+                    },
+                    "leverage": {
+                      "type": "object",
+                      "description": "Exact liquidation price, distance-to-liquidation %, and health factor (FULL tier only, when leverage supplied).",
+                      "additionalProperties": true
+                    },
+                    "proportionalRescueCommissionPolicy": {
+                      "type": "object",
+                      "description": "0.15% Pre-Flight swap and 5%-10% Safe-Harbor terms (FULL tier only).",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "savedCapitalEstimateUsd"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "amm": {
+                    "exactAmountOut": "59362905626",
+                    "purePriceImpactBps": 473,
+                    "mevRisk": "CRITICAL",
+                    "recommendedSlippageBps": 25
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.10 USDC / Signal $0.04 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.04",
+            "max": "0.10"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.10",
+          "essentialSignalOnlyAmount": "0.04",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Swap | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/token-rug-scanner": {
+      "get": {
+        "operationId": "scanTokenRugpullAndHoneypotGet",
+        "tags": [
+          "Honeypot Detection",
+          "Token Safety",
+          "Rugpull Scanner",
+          "Before Swap",
+          "Live 5-EVM RPC Bytecode",
+          "EIP-1167 Clones"
+        ],
+        "summary": "5-EVM Token Honeypot & Bytecode/Proxy Forensics ($0.12 Full / $0.04 Signal + 0.15% Position / 5%-10% Rescue, Anti-Bypass, GET/POST)",
+        "description": "Audits any EVM token (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) directly by tokenAddress (0x...) via GET query or POST JSON without requiring Solidity source code! Performs live RPC bytecode selector disassembly (blacklist, hidden mint, dynamic sell tax, pause switches), EIP-1967/EIP-1167 proxy implementation inspection, plus 14-rule AST analysis when optional .sol code is supplied. Hybrid Pricing: $0.12 USDC Full Report ($0.04 Signal Only) + 0.15% Pre-Flight / 5%-10% Safe-Harbor rescue split on saved capital (Anti-Bypass Seal on salvageable CRITICAL/HIGH fixes). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
+        "parameters": [
+          {
+            "name": "tokenAddress",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "default": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+            },
+            "description": "Deployed ERC-20 token address (0x...) on chainId to scan for honeypots, taxes, and EIP-1167 proxies."
+          },
+          {
+            "name": "chainId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "enum": [
+                8453,
+                42161,
+                10,
+                137,
+                1
+              ],
+              "default": 8453
+            },
+            "description": "Target EVM chain ID (default 8453 Base Mainnet)."
+          },
+          {
+            "name": "tokenName",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional token ticker label."
+          },
+          {
+            "name": "tier",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "FULL",
+                "ESSENTIAL"
+              ],
+              "default": "FULL"
+            },
+            "description": "ESSENTIAL ($0.04 USDC) returns verdict scalars only; FULL ($0.12 USDC) returns live RPC forensics & sellSimulation."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Trade safety gate recommendation."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light risk indicator."
+                    },
+                    "decision": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "UNVERIFIED_RPC",
+                        "CRITICAL_HONEYPOT_RISK"
+                      ],
+                      "description": "Normalized sellability decision."
+                    },
+                    "canSell": {
+                      "type": "boolean",
+                      "description": "True when no transfer locks, honeypot hooks, or blocking traps were detected."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "CLEAN",
+                        "CAUTION_CENTRALIZED",
+                        "HIGH_RUG_RISK",
+                        "CRITICAL_HONEYPOT_SCAM",
+                        "UNVERIFIED_RPC"
+                      ],
+                      "description": "Overall rugpull/honeypot verdict."
+                    },
+                    "rugProbabilityScore": {
+                      "type": "number",
+                      "description": "Weighted rugpull risk score from 0 to 100."
+                    },
+                    "isHoneypotLikely": {
+                      "type": "boolean",
+                      "description": "True if explicit sell-blocking or honeypot trap signatures matched."
+                    },
+                    "inspectionMode": {
+                      "type": "string",
+                      "description": "Whether inspection used live RPC bytecode, static Solidity AST, or hybrid."
+                    },
+                    "tokenName": {
+                      "type": "string",
+                      "description": "Resolved token name label."
+                    },
+                    "tokenAddress": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Inspected token address (null when scanning pre-deploy code only)."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID."
+                    },
+                    "sellSimulation": {
+                      "type": "object",
+                      "description": "Simulated sellability and liquidity-lock indicators (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "liveOnChainForensics": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Live RPC bytecode size, proxy implementation, owner status, and pause state (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "pillars": {
+                      "type": "object",
+                      "description": "Boolean breakdown across 6 rugpull pillars (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "forensicEvidence": {
+                      "type": "array",
+                      "description": "Matched AST and bytecode rules with snippets (FULL tier only).",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "decision",
+                    "canSell",
+                    "verdict",
+                    "rugProbabilityScore",
+                    "isHoneypotLikely",
+                    "inspectionMode",
+                    "tokenName",
+                    "chainId"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "action": "PROCEED",
+                  "signal": "GREEN_LIGHT",
+                  "canSell": true,
+                  "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                  "rugProbabilityScore": 0,
+                  "verdict": "CLEAN",
+                  "isHoneypotLikely": false
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.12 USDC / Signal $0.04 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.04",
+            "max": "0.12"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.12",
+          "essentialSignalOnlyAmount": "0.04",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Posición | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      },
+      "post": {
+        "operationId": "scanTokenRugpullAndHoneypot",
+        "tags": [
+          "Honeypot Detection",
+          "Token Safety",
+          "Rugpull Scanner",
+          "Before Swap",
+          "Live 5-EVM RPC Bytecode",
+          "EIP-1167 Clones"
+        ],
+        "summary": "5-EVM Token Honeypot & Bytecode/Proxy Forensics ($0.12 Full / $0.04 Signal + 0.15% Position / 5%-10% Rescue, Anti-Bypass, GET/POST)",
+        "description": "Audits any EVM token (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) directly by tokenAddress (0x...) via GET query or POST JSON without requiring Solidity source code! Performs live RPC bytecode selector disassembly (blacklist, hidden mint, dynamic sell tax, pause switches), EIP-1967/EIP-1167 proxy implementation inspection, plus 14-rule AST analysis when optional .sol code is supplied. Hybrid Pricing: $0.12 USDC Full Report ($0.04 Signal Only) + 0.15% Pre-Flight / 5%-10% Safe-Harbor rescue split on saved capital (Anti-Bypass Seal on salvageable CRITICAL/HIGH fixes).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tokenAddress": {
+                    "type": "string",
+                    "description": "Deployed 42-char EVM ERC-20 contract address (0x...) inspected via live RPC bytecode & proxy slots (no Solidity source required). Provide tokenAddress, code, or both."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "EVM Chain ID for RPC lookup when tokenAddress is supplied (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; unknown falls back to 8453)."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Optional Solidity (.sol) source code for pre-deployment 14-rule rugpull AST scan or hybrid source + bytecode analysis."
+                  },
+                  "tokenName": {
+                    "type": "string",
+                    "description": "Optional token ticker or label echoed in the report."
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "FULL",
+                      "ESSENTIAL"
+                    ],
+                    "default": "FULL",
+                    "description": "Billing & output depth: FULL ($0.12 USDC) returns sellSimulation, liveOnChainForensics, risk pillars, and forensicEvidence; ESSENTIAL ($0.04 USDC) returns verdict, canSell, score, and action scalars only."
+                  }
+                }
+              },
+              "example": {
+                "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "chainId": 8453
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Trade safety gate recommendation."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light risk indicator."
+                    },
+                    "decision": {
+                      "type": "string",
+                      "enum": [
+                        "SAFE",
+                        "UNVERIFIED_RPC",
+                        "CRITICAL_HONEYPOT_RISK"
+                      ],
+                      "description": "Normalized sellability decision."
+                    },
+                    "canSell": {
+                      "type": "boolean",
+                      "description": "True when no transfer locks, honeypot hooks, or blocking traps were detected."
+                    },
+                    "verdict": {
+                      "type": "string",
+                      "enum": [
+                        "CLEAN",
+                        "CAUTION_CENTRALIZED",
+                        "HIGH_RUG_RISK",
+                        "CRITICAL_HONEYPOT_SCAM",
+                        "UNVERIFIED_RPC"
+                      ],
+                      "description": "Overall rugpull/honeypot verdict."
+                    },
+                    "rugProbabilityScore": {
+                      "type": "number",
+                      "description": "Weighted rugpull risk score from 0 to 100."
+                    },
+                    "isHoneypotLikely": {
+                      "type": "boolean",
+                      "description": "True if explicit sell-blocking or honeypot trap signatures matched."
+                    },
+                    "inspectionMode": {
+                      "type": "string",
+                      "description": "Whether inspection used live RPC bytecode, static Solidity AST, or hybrid."
+                    },
+                    "tokenName": {
+                      "type": "string",
+                      "description": "Resolved token name label."
+                    },
+                    "tokenAddress": {
+                      "type": [
+                        "string",
+                        "null"
+                      ],
+                      "description": "Inspected token address (null when scanning pre-deploy code only)."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID."
+                    },
+                    "sellSimulation": {
+                      "type": "object",
+                      "description": "Simulated sellability and liquidity-lock indicators (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "liveOnChainForensics": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Live RPC bytecode size, proxy implementation, owner status, and pause state (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "pillars": {
+                      "type": "object",
+                      "description": "Boolean breakdown across 6 rugpull pillars (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "forensicEvidence": {
+                      "type": "array",
+                      "description": "Matched AST and bytecode rules with snippets (FULL tier only).",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "decision",
+                    "canSell",
+                    "verdict",
+                    "rugProbabilityScore",
+                    "isHoneypotLikely",
+                    "inspectionMode",
+                    "tokenName",
+                    "chainId"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "action": "PROCEED",
+                  "signal": "GREEN_LIGHT",
+                  "canSell": true,
+                  "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                  "rugProbabilityScore": 0,
+                  "verdict": "CLEAN",
+                  "isHoneypotLikely": false
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($0.12 USDC / Signal $0.04 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "0.04",
+            "max": "0.12"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "0.12",
+          "essentialSignalOnlyAmount": "0.04",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight Posición | 5%-10% Rescate Safe-Harbor sobre liquidez salvada (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/protocol-dossier": {
+      "post": {
+        "operationId": "generateMultiContractProtocolDossier",
+        "tags": [
+          "DeFi Protocol Audit",
+          "Cross-Contract Reentrancy",
+          "Bug Bounty Dossier",
+          "Invariant Engine"
+        ],
+        "summary": "Multi-Contract DeFi Protocol Dossier & Invariant Engine ($12.00 Floor / $3.50 Signal + 0.15% SLA / 5%-10% Rescue, Anti-Bypass)",
+        "description": "Cross-contract call graph across 5 EVM chains (up to 20 files), cross-contract Read-Only Reentrancy detection & 6 ERC-4626/Oracle invariants. Base $12.00 USDC ($3.50 Signal) delivers executive verdict, call graph & Atomic 90%-95% / 5%-10% Safe-Harbor rescue bundle; Anti-Bypass Seal keeps exact line-level patches for CRITICAL/HIGH vulnerabilities sealed until settling the +0.15% SLA or 5%-10% Safe-Harbor rescue split on saved capital.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "protocolName": {
+                    "type": "string",
+                    "default": "DeFi Protocol",
+                    "description": "DeFi protocol or project name echoed in executiveSummary."
+                  },
+                  "tvlTargetUsd": {
+                    "type": "number",
+                    "default": 1000000,
+                    "minimum": 0,
+                    "description": "Target or declared TVL in USD used for bug bounty reward calibration when live RPC TVL is absent or lower."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "EVM Chain ID used when optional contractAddress is supplied for live RPC liquidity lookup (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; unknown falls back to 8453)."
+                  },
+                  "contractAddress": {
+                    "type": "string",
+                    "description": "Optional deployed EVM vault/pool address (0x...) on chainId for live RPC TVL verification and unsigned Safe-Harbor rescue bundle generation."
+                  },
+                  "ownerTreasury": {
+                    "type": "string",
+                    "description": "Optional protocol multisig/treasury recipient (0x...) designated to receive 90%-95% of rescued funds in unsigned Safe-Harbor calldata."
+                  },
+                  "contracts": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 20,
+                    "description": "Non-empty array of Solidity contracts belonging to the protocol (1 to 20 {name, code} objects; additional items beyond 20 are ignored).",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "name": {
+                          "type": "string",
+                          "description": "Contract filename or identifier (e.g., AegisVault.sol)."
+                        },
+                        "code": {
+                          "type": "string",
+                          "description": "Non-empty Solidity (.sol) source code for this contract."
+                        }
+                      },
+                      "required": [
+                        "name",
+                        "code"
+                      ]
+                    }
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "FULL",
+                      "ESSENTIAL"
+                    ],
+                    "default": "FULL",
+                    "description": "Billing & output depth: FULL ($12.00 USDC) returns callGraphEdges, per-contract findings, invariants, and Safe-Harbor rescue calldata (subject to Anti-Bypass sealing on CRITICAL/HIGH until proportional settlement); ESSENTIAL ($3.50 USDC) returns readiness score, grade, status, and severity counts only."
+                  }
+                },
+                "required": [
+                  "contracts"
+                ]
+              },
+              "example": {
+                "protocolName": "AegisYield",
+                "tvlTargetUsd": 2000000,
+                "contracts": [
+                  {
+                    "name": "AegisVault.sol",
+                    "code": "pragma solidity ^0.8.20; contract AegisVault { function totalAssets() public view returns (uint256) { return 1000; } function withdraw(uint256 a) external { (bool s,) = msg.sender.call{value: a}(\"\"); require(s); } }"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Protocol deployment gate directive."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light risk indicator."
+                    },
+                    "protocolName": {
+                      "type": "string",
+                      "description": "Evaluated protocol name."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID."
+                    },
+                    "protocolSecurityScore": {
+                      "type": "number",
+                      "description": "Weighted multi-contract security score from 0 to 100."
+                    },
+                    "grade": {
+                      "type": "string",
+                      "enum": [
+                        "A",
+                        "B",
+                        "C",
+                        "D",
+                        "F"
+                      ],
+                      "description": "Letter grade derived from protocolSecurityScore."
+                    },
+                    "deploymentReadiness": {
+                      "type": "string",
+                      "enum": [
+                        "READY_FOR_CONTEST",
+                        "REMEDIATION_REQUIRED",
+                        "BLOCK_LAUNCH"
+                      ],
+                      "description": "Launch readiness classification."
+                    },
+                    "verifiedOnChainTvlUsd": {
+                      "type": "number",
+                      "description": "Live on-chain TVL verified via RPC when contractAddress is supplied (0 otherwise)."
+                    },
+                    "summary": {
+                      "type": "object",
+                      "description": "Aggregated finding severity totals and failed invariant count.",
+                      "properties": {
+                        "CRITICAL": {
+                          "type": "integer"
+                        },
+                        "HIGH": {
+                          "type": "integer"
+                        },
+                        "MEDIUM": {
+                          "type": "integer"
+                        },
+                        "LOW": {
+                          "type": "integer"
+                        },
+                        "GAS": {
+                          "type": "integer"
+                        },
+                        "failedInvariantsCount": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "CRITICAL",
+                        "HIGH",
+                        "MEDIUM",
+                        "LOW",
+                        "GAS",
+                        "failedInvariantsCount"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "executiveSummary": {
+                      "type": "object",
+                      "description": "Consolidated protocol score, LOC, centralizationRiskIndex, and readiness breakdown (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "contractAudits": {
+                      "type": "array",
+                      "description": "Per-contract security audits and findings (FULL tier only).",
+                      "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                      }
+                    },
+                    "crossContractAnalysis": {
+                      "type": "object",
+                      "description": "Cross-contract call graph, read-only reentrancy findings, admin privilege map, and invariant checks (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "bugBountyCalibration": {
+                      "type": "object",
+                      "description": "Recommended bounty reward schedule by severity calibrated to TVL (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "capitalSalvageAndSafeHarbor": {
+                      "type": "object",
+                      "description": "Unsigned Safe-Harbor rescue bundle or optional pre-deploy circuit breaker (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "proportionalRescueCommissionPolicy": {
+                      "type": "object",
+                      "description": "0.15% Pre-Flight SLA and 5%-10% Safe-Harbor settlement metadata (FULL tier only).",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "protocolName",
+                    "chainId",
+                    "protocolSecurityScore",
+                    "grade",
+                    "deploymentReadiness",
+                    "verifiedOnChainTvlUsd",
+                    "summary"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "protocolName": "AegisYield",
+                  "executiveSummary": {
+                    "protocolSecurityScore": 45,
+                    "grade": "D",
+                    "deploymentReadiness": "BLOCK_LAUNCH"
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($12.00 USDC / Signal $3.50 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "3.50",
+            "max": "12.00"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "12.00",
+          "essentialSignalOnlyAmount": "3.50",
+          "proportionalRateOverCapital": "+0.15% Pre-Flight SLA | 5%-10% Rescate Safe-Harbor sobre TVL salvado (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    },
+    "/api/v1/deep-exploit-bounty": {
+      "post": {
+        "operationId": "simulateDeepExploitAndWhitehatBounty",
+        "tags": [
+          "Whale Whitehat Bounty",
+          "Flash Loan Exploits",
+          "Safe-Harbor Rescue",
+          "Pelotazo M2M"
+        ],
+        "summary": "Institutional Flash-Loan Simulation & Atomic Safe-Harbor Rescue ($45.00 Floor / $9.50 Triage + 5%-10% Rescue Split, Anti-Bypass)",
+        "description": "Flash-loan drain simulation + live 5-EVM on-chain liquidity verification (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1: USDC/WETH/ETH/cbBTC) + executable EIP-5792 wallet_sendCalls / sequential EOA Safe-Harbor rescue bundle returning 90%-95% of vulnerable pool funds to ownerTreasury and settling 5%-10% whitehat bounty ($0 upfront bounty risk; Anti-Bypass Seal protects CRITICAL/HIGH remediation & PoC coordinates until bounty settlement).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "protocolName": {
+                    "type": "string",
+                    "description": "Target protocol or pool identifier (non-empty string required)."
+                  },
+                  "poolAddress": {
+                    "type": "string",
+                    "default": "0x420DD381b31aEf6683db6B902084cB0FFECe40Da",
+                    "description": "Target 42-char EVM pool or vault contract address (0x...) inspected via live RPC on chainId."
+                  },
+                  "chainId": {
+                    "type": "integer",
+                    "enum": [
+                      8453,
+                      42161,
+                      10,
+                      137,
+                      1
+                    ],
+                    "default": 8453,
+                    "description": "Target EVM chain ID for live RPC bytecode and TVL verification (8453 Base, 42161 Arbitrum, 10 Optimism, 137 Polygon, 1 Ethereum; unknown falls back to 8453)."
+                  },
+                  "ownerTreasury": {
+                    "type": "string",
+                    "description": "Optional protocol owner/multisig recipient (0x...) receiving 90%-95% of assets in the generated unsigned Safe-Harbor calldata."
+                  },
+                  "tvlUsd": {
+                    "type": "number",
+                    "default": 250000,
+                    "minimum": 0,
+                    "description": "Declared pool TVL in USD; automatically overridden upward if live on-chain RPC TVL exceeds it."
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Optional Solidity (.sol) contract source code to include static exploit, honeypot, and slot0 manipulation analysis."
+                  },
+                  "tier": {
+                    "type": "string",
+                    "enum": [
+                      "FULL",
+                      "ESSENTIAL"
+                    ],
+                    "default": "FULL",
+                    "description": "Billing & output depth: FULL ($45.00 USDC) returns flashLoanSimulation, liveOnChainPoolForensics, and unsigned Safe-Harbor rescue bundle; ESSENTIAL ($9.50 USDC) returns vulnerabilitySeverity, exploitImmunityScore, and summary counts only."
+                  }
+                },
+                "required": [
+                  "protocolName"
+                ]
+              },
+              "example": {
+                "protocolName": "BaseLendingPool",
+                "poolAddress": "0x420DD381b31aEf6683db6B902084cB0FFECe40Da",
+                "tvlUsd": 250000
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Deterministic JSON analysis report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "settled": {
+                      "type": "boolean",
+                      "description": "Whether x402 USDC payment settled cleanly."
+                    },
+                    "action": {
+                      "type": "string",
+                      "enum": [
+                        "PROCEED",
+                        "CAUTION",
+                        "ABORT"
+                      ],
+                      "description": "Recommended exploit mitigation action."
+                    },
+                    "signal": {
+                      "type": "string",
+                      "enum": [
+                        "GREEN_LIGHT",
+                        "YELLOW_LIGHT",
+                        "RED_LIGHT"
+                      ],
+                      "description": "Traffic-light severity indicator."
+                    },
+                    "tier": {
+                      "type": "string",
+                      "description": "Service classification identifier ('institutional_whale_bounty')."
+                    },
+                    "protocol": {
+                      "type": "string",
+                      "description": "Evaluated protocol identifier."
+                    },
+                    "poolAddress": {
+                      "type": "string",
+                      "description": "Target EVM pool or vault address inspected."
+                    },
+                    "chainId": {
+                      "type": "integer",
+                      "description": "Resolved EVM chain ID."
+                    },
+                    "verifiedOnChainTvlUsd": {
+                      "type": "number",
+                      "description": "Live on-chain TVL verified via RPC (0 if unavailable or undeployed)."
+                    },
+                    "tvlAnalyzedUsd": {
+                      "type": "number",
+                      "description": "Effective TVL used for whitehat bounty calculation."
+                    },
+                    "exploitImmunityScore": {
+                      "type": "number",
+                      "description": "Estimated exploit immunity score from 0 to 100."
+                    },
+                    "vulnerabilitySeverity": {
+                      "type": "string",
+                      "enum": [
+                        "CRITICAL_EXPLOITABLE",
+                        "HIGH_ARBITRAGEABLE",
+                        "LOW_RESILIENT"
+                      ],
+                      "description": "Overall exploitability tier."
+                    },
+                    "summary": {
+                      "type": "object",
+                      "description": "Critical/High severity counts, live TVL, and entitled whitehat bounty summary.",
+                      "properties": {
+                        "CRITICAL": {
+                          "type": "integer"
+                        },
+                        "HIGH": {
+                          "type": "integer"
+                        },
+                        "verifiedOnChainTvlUsd": {
+                          "type": "number"
+                        },
+                        "entitledSafeHarborBountyUsdc": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "CRITICAL",
+                        "HIGH",
+                        "verifiedOnChainTvlUsd",
+                        "entitledSafeHarborBountyUsdc"
+                      ],
+                      "additionalProperties": true
+                    },
+                    "liveOnChainPoolForensics": {
+                      "type": [
+                        "object",
+                        "null"
+                      ],
+                      "description": "Live RPC bytecode and proxy storage slot forensics for poolAddress (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "whitehatRescuePlan": {
+                      "type": "object",
+                      "description": "90%-95% owner / 5%-10% whitehat split economics and private relay instructions (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "capitalSalvageAndSafeHarbor": {
+                      "type": "object",
+                      "description": "Unsigned EIP-5792/EOA Safe-Harbor execution bundle (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "flashLoanSimulation": {
+                      "type": "object",
+                      "description": "Spot price oracle manipulation and reentrancy vector assessment (FULL tier only).",
+                      "additionalProperties": true
+                    },
+                    "auditDetails": {
+                      "type": [
+                        "object",
+                        "string"
+                      ],
+                      "description": "Detailed static audit findings when code is provided, or RPC summary note (FULL tier only)."
+                    },
+                    "proportionalRescueCommissionPolicy": {
+                      "type": "object",
+                      "description": "Anti-Bypass and Safe-Harbor bounty policy metadata (FULL tier only).",
+                      "additionalProperties": true
+                    }
+                  },
+                  "required": [
+                    "settled",
+                    "action",
+                    "signal",
+                    "tier",
+                    "protocol",
+                    "poolAddress",
+                    "chainId",
+                    "verifiedOnChainTvlUsd",
+                    "tvlAnalyzedUsd",
+                    "exploitImmunityScore",
+                    "vulnerabilitySeverity",
+                    "summary"
+                  ],
+                  "additionalProperties": true
+                },
+                "example": {
+                  "protocol": "BaseLendingPool",
+                  "tier": "institutional_whale_bounty",
+                  "exploitImmunityScore": 82,
+                  "vulnerabilitySeverity": "HIGH_ARBITRAGEABLE",
+                  "whitehatRescuePlan": {
+                    "standardWhitehatBountyPct": 10,
+                    "entitledBountyRewardUsdc": 25000
+                  }
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Payment Required ($45.00 USDC / Signal $9.50 USDC on Base Mainnet eip155:8453 via x402 v2)"
+          }
+        },
+        "x-payment-info": {
+          "protocols": [
+            {
+              "x402": {
+                "version": 2,
+                "network": "eip155:8453",
+                "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+                "payTo": "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f",
+                "baseBuilderCode": "bc_i26d7owr"
+              }
+            }
+          ],
+          "price": {
+            "mode": "dynamic",
+            "currency": "USD",
+            "min": "9.50",
+            "max": "45.00"
+          }
+        },
+        "x-pricing-policy": {
+          "mode": "hybrid",
+          "currency": "USD",
+          "baseFloorAmount": "45.00",
+          "essentialSignalOnlyAmount": "9.50",
+          "proportionalRateOverCapital": "5%-10% Atomic EIP-5792 / Sequential EOA Safe-Harbor Rescue Split on Rescued Capital (Anti-Bypass)",
+          "pricingPolicy": "Hybrid M2M (Anti-Bypass Services 2-7): Low Base Micro-Floor (<$200 USD) + 0.15% Pre-Flight SLA / 5%-10% Safe-Harbor Rescue Bounty on Saved Capital, auto-capped at X-Agent-Budget"
+        }
+      }
+    }
+  }
+}

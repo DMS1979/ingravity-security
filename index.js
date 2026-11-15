@@ -120,7 +120,7 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_token_rug_scanner",
-        description: "Direct 5-EVM ERC-20 honeypot & rugpull forensic scanner by tokenAddress ($0.50 USDC Full Report / $0.25 USDC Signal Only via x402). Audits any EVM token directly by 0x address via live RPC bytecode disassembly & proxy storage slots — no Solidity source code required.",
+        description: "Direct 5-EVM ERC-20 honeypot & rugpull forensic scanner by tokenAddress ($0.12 USDC Full Report / $0.04 USDC Signal Only via x402). Audits any EVM token directly by 0x address via live RPC bytecode disassembly & proxy storage slots — no Solidity source code required.",
         schema: {
           type: "object",
           properties: {
@@ -136,7 +136,7 @@ class IngravitySecurityActionProvider {
       },
       {
         name: "ingravity_defi_math_guard",
-        description: "Exact BigInt AMM slippage, MEV sandwich & leverage liquidation guard across 5 EVM chains via x402 ($0.15 USDC Full / $0.10 USDC Signal Only). 48-step binary search for mathematically provable minAmountOut.",
+        description: "Exact BigInt AMM slippage, MEV sandwich & leverage liquidation guard across 5 EVM chains via x402 ($0.10 USDC Full / $0.04 USDC Signal Only). 48-step binary search for mathematically provable minAmountOut.",
         schema: {
           type: "object",
           properties: {
@@ -462,7 +462,7 @@ const fastPingAction = {
 const scanTokenAction = {
   name: "INGRAVITY_SCAN_TOKEN_SECURITY",
   similes: ["CHECK_TOKEN_SAFETY", "VERIFY_HONEYPOT", "AUDIT_ERC20_RUG", "SCAN_TOKEN_RISK"],
-  description: "Scans any Base ERC-20 token directly by tokenAddress (0x...) via live RPC bytecode & EIP-1167/1967 proxy storage slots ($0.50 Full / $0.25 Signal via x402).",
+  description: "Scans any Base ERC-20 token directly by tokenAddress (0x...) via live RPC bytecode & EIP-1167/1967 proxy storage slots ($0.12 Full / $0.04 Signal via x402).",
   validate: async (runtime, message) => /0x[a-fA-F0-9]{40}/.test(message.content?.text || ""),
   handler: async (runtime, message, state, options, callback) => {
     try {
@@ -472,7 +472,7 @@ const scanTokenAction = {
 
       const provider = new IngravitySecurityActionProvider({
         walletProvider: runtime?.walletProvider || null,
-        maxSpendUsdc: runtime?.maxSpendPerAction || 0.50
+        maxSpendUsdc: runtime?.maxSpendPerAction || 0.12
       });
       const res = await provider.tokenRugScanner({ tokenAddress, chainId: 8453 });
       if (callback) {

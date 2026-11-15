@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * ingravity-mcp (ingravity-security v1.3.0 STDIO-to-HTTP MCP Bridge)
+ * ingravity-mcp (ingravity-security v1.3.0 STDIO-to-HTTP MCP Bridge | Swarm v3.13.0)
  * ----------------------------------------------------------------------------
  * Zero-dependency Model Context Protocol (MCP 2025-06-18) STDIO bridge for
  * Claude Desktop, Cursor, Windsurf, Cline, and autonomous agent runtimes.

@@ -1,12 +1,13 @@
 # Smithery.ai Remote Streamable-HTTP MCP Server Manifest
-# Ready for 1-click registration at https://smithery.ai/new
+# Ready for registration at https://smithery.ai/new or via smithery mcp publish
 name: ingravity-evm-security-mcp
-displayName: Ingravity EVM Security & Anti-Drainer Firewall v3.10 (Base x402)
+displayName: Ingravity EVM Security & Anti-Drainer Firewall v3.13 (5 EVM x402)
 description: >-
-  Deterministic pre-sign EVM transaction firewall ($0.10 USDC), ultra-fast binary address safety ping ($0.03 USDC),
-  live Base Mainnet RPC token honeypot/rugpull scanner by tokenAddress ($0.50/$0.25 USDC), BigInt DeFi MEV slippage guard,
-  24-vector Solidity static auditor, and EIP-5792 Safe-Harbor rescue settled per-call via x402 v2 on Base Mainnet (eip155:8453).
-  Zero free verdict leaks; STDIO bridge also available via `npx -y --package=ingravity-security ingravity-mcp` (v1.2.0).
+  Swarm v3.13.0 across 5 EVM chains (Base, Arbitrum, Optimism, Polygon, Ethereum): $0.01 USDC binary Fast-Ping,
+  $0.04/$0.12 live RPC token honeypot/rugpull scanner by tokenAddress (GET/POST), $0.04/$0.10 BigInt DeFi MEV guard,
+  $0.10 pre-sign EVM transaction firewall, and 24-vector Solidity audit ($0.35-$45.00) with +0.15% Pre-Flight SLA &
+  5%-10% Whitehat Safe-Harbor Rescue Bounty (Anti-Bypass Seal on Services 2-7). Zero free verdict leaks; STDIO bridge
+  available via `npx -y --package=ingravity-security ingravity-mcp` (v1.3.0).
 homepage: https://red-shape-1b3b.daviddelmoral79.workers.dev
 transport:
   type: streamable-http
