@@ -20,7 +20,7 @@ const readline = require("readline");
 const { encodeErc8021Calldata, ERC8021_BUILDER_CODE, ERC8021_SUFFIX_HEX } = require("./index.js");
 
 const SERVER_NAME = "ingravity-security";
-const SERVER_VERSION = "1.3.0";
+const SERVER_VERSION = "1.3.1";
 const DEFAULT_API_URL = (
   process.env.INGRAVITY_API_URL ||
   process.env.INGRAVITY_WORKER_URL ||

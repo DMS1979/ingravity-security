@@ -2,7 +2,8 @@
 
 Self-contained, zero-dependency **Model Context Protocol (`MCP 2025-06-18`) STDIO Server** implemented in Node.js (`mcp.js`) for 5-EVM Web3 pre-flight security, EVM calldata structural decoding, ERC-8021 Base Builder attribution, live RPC token honeypot scanning, BigInt DeFi MEV slippage math, and 24-vector Solidity auditing across **Base (`8453`)**, **Arbitrum (`42161`)**, **Optimism (`10`)**, **Polygon (`137`)**, and **Ethereum (`1`)**.
 
-[![npm version](https://img.shields.io/badge/npm-1.3.0-blue.svg)](https://www.npmjs.com/package/ingravity-security)
+[![npm version](https://img.shields.io/badge/npm-1.3.1-blue.svg)](https://www.npmjs.com/package/ingravity-security)
+[![Glama MCP Server](https://glama.ai/mcp/servers/DMS1979/ingravity-security/badges/score.svg)](https://glama.ai/mcp/servers/DMS1979/ingravity-security)
 [![MCP Spec](https://img.shields.io/badge/MCP-2025--06--18-6366F1.svg)](https://modelcontextprotocol.io)
 [![Network](https://img.shields.io/badge/Network-Base%20Mainnet%20(8453)-0052FF.svg)](https://basescan.org)
 [![Settlement](https://img.shields.io/badge/Settlement-x402%20v2%20USDC-10B981.svg)](https://www.x402.org)
@@ -40,7 +41,7 @@ Add this entry to your MCP client configuration (`claude_desktop_config.json` or
   "mcpServers": {
     "ingravity-security": {
       "command": "npx",
-      "args": ["-y", "-p", "ingravity-security@1.3.0", "ingravity-mcp"],
+      "args": ["-y", "-p", "ingravity-security@1.3.1", "ingravity-mcp"],
       "env": {
         "INGRAVITY_AGENT_BUDGET": "0.10"
       }

@@ -22,7 +22,7 @@ const BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const BASE_CHAIN_ID = 8453;
 const ERC8021_BUILDER_CODE = "bc_i26d7owr";
 const ERC8021_SUFFIX_HEX = "0b62635f69323664376f77720080218021802180218021802180218021";
-const SDK_VERSION = "1.3.0";
+const SDK_VERSION = "1.3.1";
 
 function encodeErc8021Calldata(calldataHex = "0x") {
   const clean = String(calldataHex || "0x").trim();
