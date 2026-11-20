@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ingravity Security MCP Server (v1.3.2 — Model Context Protocol 2025-06-18)
+ * Ingravity Security MCP Server (v1.3.3 — Model Context Protocol 2025-06-18 + x402 v2 MCP Transport)
  * ----------------------------------------------------------------------------
  * Self-contained, zero-dependency Node.js STDIO MCP Server implementation.
  *
@@ -20,7 +20,7 @@ const readline = require("readline");
 const { encodeErc8021Calldata, ERC8021_BUILDER_CODE, ERC8021_SUFFIX_HEX } = require("./index.js");
 
 const SERVER_NAME = "ingravity-security";
-const SERVER_VERSION = "1.3.2";
+const SERVER_VERSION = "1.3.3";
 const DEFAULT_API_URL = (
   process.env.INGRAVITY_API_URL ||
   process.env.INGRAVITY_WORKER_URL ||
@@ -270,12 +270,57 @@ function makeError(id, code, message, data) {
   });
 }
 
-function makeToolResult(payload, isError = false) {
-  return {
+function makeToolResult(payload, isError = false, extraMeta = null) {
+  const result = {
     content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
-    structuredContent: payload,
-    ...(isError ? { isError: true } : {})
+    structuredContent: payload
   };
+  if (isError) result.isError = true;
+  if (extraMeta && typeof extraMeta === "object" && Object.keys(extraMeta).length > 0) {
+    result._meta = extraMeta;
+  }
+  return result;
+}
+
+function encodeX402PaymentHeader(rawPayment) {
+  if (!rawPayment) return "";
+  if (typeof rawPayment === "object") {
+    return Buffer.from(JSON.stringify(rawPayment), "utf8").toString("base64");
+  }
+  const str = String(rawPayment).trim();
+  if (!str) return "";
+  if (str.startsWith("{")) {
+    return Buffer.from(str, "utf8").toString("base64");
+  }
+  return str;
+}
+
+function decodeBase64JsonHeader(rawHeader) {
+  if (!rawHeader || typeof rawHeader !== "string") return null;
+  const trimmed = rawHeader.trim();
+  if (!trimmed) return null;
+  try {
+    if (trimmed.startsWith("{")) return JSON.parse(trimmed);
+    return JSON.parse(Buffer.from(trimmed, "base64").toString("utf8"));
+  } catch (_) {
+    return null;
+  }
+}
+
+function extractMetaPaymentOptions(meta) {
+  if (!meta || typeof meta !== "object") return {};
+  const out = {};
+  const rawPay = meta["x402/payment"] || meta["x402/payment-signature"] || meta["x-payment"] || meta.payment;
+  if (rawPay) out.paymentSignature = encodeX402PaymentHeader(rawPay);
+  const rawTx = meta["x-settlement-txhash"] || meta["x-tx-hash"] || meta.txHash;
+  if (rawTx) out.txHash = String(rawTx).trim();
+  const rawReceipt = meta["x-ingravity-receipt-token"] || meta.receiptToken;
+  if (rawReceipt) out.receiptToken = String(rawReceipt).trim();
+  const rawBudget = meta["x-agent-budget"] || meta.budget;
+  if (rawBudget != null && String(rawBudget).trim()) out.budget = String(rawBudget).trim();
+  const rawTrial = meta["x-ingravity-onboarding-trial"] || meta.trialToken;
+  if (rawTrial) out.onboardingTrial = String(rawTrial).trim();
+  return out;
 }
 
 function decodeCalldataLocally(dataHex) {
@@ -382,14 +427,19 @@ async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, option
     options.receiptToken ||
     process.env.INGRAVITY_RECEIPT_TOKEN ||
     sessionReceiptCache.get(cacheKey);
-  const paymentSig = options.paymentSignature || process.env.INGRAVITY_PAYMENT_SIGNATURE;
+  const paymentSig = encodeX402PaymentHeader(options.paymentSignature || process.env.INGRAVITY_PAYMENT_SIGNATURE);
   const txHash = options.txHash || process.env.INGRAVITY_TX_HASH;
+  const onboardingTrial = options.onboardingTrial || process.env.INGRAVITY_ONBOARDING_TRIAL;
   const capitalAtRisk = options.capitalAtRiskUsd || process.env.INGRAVITY_CAPITAL_AT_RISK_USD;
 
   if (budget) headers["X-Agent-Budget"] = String(budget);
   if (receiptToken) headers["X-Ingravity-Receipt-Token"] = String(receiptToken);
   if (paymentSig) headers["PAYMENT-SIGNATURE"] = String(paymentSig);
-  if (txHash) headers["X-TX-HASH"] = String(txHash);
+  if (txHash) {
+    headers["X-TX-HASH"] = String(txHash);
+    headers["X-Settlement-TxHash"] = String(txHash);
+  }
+  if (onboardingTrial) headers["X-Ingravity-Onboarding-Trial"] = String(onboardingTrial);
   if (capitalAtRisk) headers["X-Capital-At-Risk-Usd"] = String(capitalAtRisk);
 
   const res = await httpJsonRequest(method, `${baseUrl}${routePath}`, bodyObj, headers, options.timeoutMs || 15000);
@@ -404,13 +454,25 @@ async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, option
     if (newReceipt && cacheKey) {
       sessionReceiptCache.set(cacheKey, String(newReceipt));
     }
-    return makeToolResult(payload, false);
+    const payRespObj = decodeBase64JsonHeader(res.headers["payment-response"] || res.headers["x-payment-response"]);
+    const extraMeta = payRespObj ? { "x402/payment-response": payRespObj } : null;
+    return makeToolResult(payload, false, extraMeta);
+  }
+
+  if (res.status === 402) {
+    const decodedChallenge = decodeBase64JsonHeader(res.headers["payment-required"] || res.headers["x-payment-required"]);
+    const canonical402 =
+      decodedChallenge && typeof decodedChallenge === "object" && Array.isArray(decodedChallenge.accepts)
+        ? decodedChallenge
+        : (payload && payload.x402Version && Array.isArray(payload.accepts)
+          ? payload
+          : { x402Version: 2, httpStatus: 402, paymentRequired: true, ...payload });
+    return makeToolResult(canonical402, true);
   }
 
   return makeToolResult(
     {
       httpStatus: res.status,
-      ...(res.status === 402 ? { paymentRequired: true, settlementProtocol: "x402-v2-base-usdc" } : {}),
       ...payload
     },
     true
@@ -626,7 +688,9 @@ async function handleMcpMessage(jsonLine, options = {}) {
       return makeError(id, -32602, "Invalid params: tool 'name' is required.");
     }
     try {
-      const outcome = await executeToolCall(toolName, params.arguments || {}, options);
+      const metaOpts = extractMetaPaymentOptions(params._meta);
+      const mergedOptions = { ...options, ...metaOpts };
+      const outcome = await executeToolCall(toolName, params.arguments || {}, mergedOptions);
       if (outcome.rpcError) {
         return makeError(id, outcome.rpcError[0], outcome.rpcError[1]);
       }

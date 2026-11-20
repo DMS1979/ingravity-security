@@ -1,5 +1,6 @@
 const assert = require("assert");
 const fs = require("fs");
+const http = require("http");
 const path = require("path");
 const {
   IngravitySecurityActionProvider,
@@ -14,7 +15,7 @@ const { forwardMcpLine, MCP_ENDPOINT_URL } = require("./mcp.js");
 
 console.log(`[TEST] Testing Ingravity Security SDK v${SDK_VERSION} exports...`);
 
-assert.strictEqual(SDK_VERSION, "1.3.2", "SDK_VERSION must be 1.3.2");
+assert.strictEqual(SDK_VERSION, "1.3.3", "SDK_VERSION must be 1.3.3");
 assert.ok(IngravitySecurityActionProvider, "IngravitySecurityActionProvider must be exported");
 assert.ok(ingravityElizaPlugin, "ingravityElizaPlugin must be exported");
 assert.strictEqual(ERC8021_BUILDER_CODE, "bc_i26d7owr");
@@ -22,7 +23,7 @@ assert.strictEqual(typeof forwardMcpLine, "function", "mcp.js forwardMcpLine mus
 assert.ok(MCP_ENDPOINT_URL.endsWith("/mcp"), "MCP_ENDPOINT_URL must point to /mcp");
 
 const provider = new IngravitySecurityActionProvider();
-assert.strictEqual(provider.version, "1.3.2");
+assert.strictEqual(provider.version, "1.3.3");
 assert.strictEqual(provider.enableReceiptCache, true);
 assert.strictEqual(typeof provider.clearReceiptCache, "function");
 
@@ -84,14 +85,16 @@ assert.ok(workerSrc.includes("function getCapitalBandFloorUsd("), "Side-channel 
 assert.ok(workerSrc.includes("function validateSignedPaymentTerms("), "x402 guard: must validate payTo, asset and amount server-side");
 assert.ok(workerSrc.includes("function buildEip3009SigningDiagnostics("), "x402 guard: must emit EIP-3009 signing diagnostics");
 
-// Official MCP Registry 1.3.2 coherence guards
+// Official MCP Registry 1.3.3 coherence guards
 const pkgDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
 const sdkServerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "server.json"), "utf8"));
 const rootServerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "mcp_registry_server.json"), "utf8"));
-assert.strictEqual(pkgDoc.version, "1.3.2", "package.json version must be 1.3.2");
+assert.strictEqual(pkgDoc.version, "1.3.3", "package.json version must be 1.3.3");
 assert.strictEqual(pkgDoc.mcpName, "io.github.DMS1979/ingravity-security", "package.json must declare mcpName");
-assert.strictEqual(sdkServerDoc.version, "1.3.2", "sdk server.json version must be 1.3.2");
-assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.2", "sdk server.json npm package version must be 1.3.2");
+assert.strictEqual(pkgDoc.bin["ingravity-security"], "mcp.js", "package.json bin must expose ingravity-security");
+assert.strictEqual(pkgDoc.bin["ingravity-mcp"], "mcp.js", "package.json bin must expose ingravity-mcp");
+assert.strictEqual(sdkServerDoc.version, "1.3.3", "sdk server.json version must be 1.3.3");
+assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.3", "sdk server.json npm package version must be 1.3.3");
 assert.deepStrictEqual(sdkServerDoc, rootServerDoc, "sdk server.json and mcp_registry_server.json must be identical");
 assert.ok(workerSrc.includes('usdPrice: "0.01"') && (workerSrc.includes('atomicAmount: "10000"') || workerSrc.includes('amount: "10000"')), "Fast-Ping must use $0.01 (10000 atomic USDC)");
 assert.ok(workerSrc.includes("function normalizeCaip2Network("), "Worker must normalize CAIP-2 network aliases to eip155:8453");
@@ -119,5 +122,84 @@ const compactLvl2Slice = workerSrc.slice(compactLvl2Idx, compactLvl2Idx + 6200);
 assert.ok(compactLvl2Slice.includes("level <= 2"), "Compact header Levels 1-2 must preserve accepts byte-identically to 402 JSON body");
 assert.ok(compactLvl2Slice.includes("output: {\n              type: \"object\"") || compactLvl2Slice.includes("output: { type: \"object\""), "Compact header Level 2 must preserve schema.properties.output for extractSchemas2");
 
-console.log(`[TEST PASSED] v${SDK_VERSION}: ${actions.length} paid actions ($0.01 Fast-Ping), ${ingravityElizaPlugin.actions.length} Eliza actions, ERC-8021 helper, x402 v2 sanitizer, MCP STDIO bridge, immutable Glama claim & v3.13.2 guards verified.`);
-process.exit(0);
+// End-to-end STDIO @x402/mcp transport test (402 challenge -> _meta['x402/payment'] -> PAYMENT-SIGNATURE -> _meta['x402/payment-response'])
+(async () => {
+  let receivedPaymentSig = null;
+  const mockChallenge = {
+    x402Version: 2,
+    resource: { url: "https://example.test/api/v1/fast-ping" },
+    accepts: [{ scheme: "exact", network: "eip155:8453", amount: "10000", payTo: "0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f" }]
+  };
+  const mockPaymentResp = { success: true, network: "eip155:8453", transaction: "0xmocktxhash123", payer: "0x1111111111111111111111111111111111111111" };
+  const server = http.createServer((req, res) => {
+    const payHdr = req.headers["payment-signature"];
+    if (!payHdr) {
+      res.writeHead(402, {
+        "Content-Type": "application/json",
+        "PAYMENT-REQUIRED": Buffer.from(JSON.stringify(mockChallenge), "utf8").toString("base64")
+      });
+      res.end(JSON.stringify(mockChallenge));
+      return;
+    }
+    receivedPaymentSig = payHdr;
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+      "PAYMENT-RESPONSE": Buffer.from(JSON.stringify(mockPaymentResp), "utf8").toString("base64")
+    });
+    res.end(JSON.stringify({ status: "SAFE", address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913" }));
+  });
+
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const port = server.address().port;
+  const mockApiUrl = `http://127.0.0.1:${port}`;
+  try {
+    // 1. Unpaid call must return canonical x402 v2 structuredContent with isError: true
+    const rawUnpaid = await forwardMcpLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: 101,
+        method: "tools/call",
+        params: {
+          name: "ingravity_fastPingAddressSafety",
+          arguments: { address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", chainId: 8453 }
+        }
+      }),
+      { apiUrl: mockApiUrl }
+    );
+    const unpaidResp = JSON.parse(rawUnpaid);
+    assert.strictEqual(unpaidResp.result.isError, true, "Unpaid STDIO call must set isError: true");
+    assert.strictEqual(unpaidResp.result.structuredContent.x402Version, 2, "Unpaid STDIO 402 must expose canonical x402Version: 2");
+    assert.strictEqual(unpaidResp.result.structuredContent.accepts[0].amount, "10000", "Unpaid STDIO 402 must expose canonical accepts[0]");
+
+    // 2. Paid retry with params._meta['x402/payment'] object must forward Base64 PAYMENT-SIGNATURE and return _meta['x402/payment-response']
+    const fakeSignedPayment = { x402Version: 2, payload: { signature: "0xdeadbeef", authorization: { from: "0x1111111111111111111111111111111111111111", value: "10000" } } };
+    const rawPaid = await forwardMcpLine(
+      JSON.stringify({
+        jsonrpc: "2.0",
+        id: 102,
+        method: "tools/call",
+        params: {
+          name: "ingravity_fastPingAddressSafety",
+          arguments: { address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", chainId: 8453 },
+          _meta: { "x402/payment": fakeSignedPayment }
+        }
+      }),
+      { apiUrl: mockApiUrl }
+    );
+    const paidResp = JSON.parse(rawPaid);
+    assert.ok(receivedPaymentSig, "STDIO mcp.js must forward params._meta['x402/payment'] as PAYMENT-SIGNATURE header");
+    const decodedSent = JSON.parse(Buffer.from(receivedPaymentSig, "base64").toString("utf8"));
+    assert.strictEqual(decodedSent.payload.signature, "0xdeadbeef", "Decoded PAYMENT-SIGNATURE must match params._meta['x402/payment']");
+    assert.strictEqual(paidResp.result.isError, undefined, "Paid STDIO call must succeed");
+    assert.strictEqual(paidResp.result.structuredContent.status, "SAFE", "Paid STDIO result must return verdict");
+    assert.strictEqual(paidResp.result._meta["x402/payment-response"].transaction, "0xmocktxhash123", "Paid STDIO result must expose _meta['x402/payment-response']");
+  } finally {
+    server.close();
+  }
+
+  console.log(`[TEST PASSED] v${SDK_VERSION}: ${actions.length} paid actions ($0.01 Fast-Ping), ${ingravityElizaPlugin.actions.length} Eliza actions, STDIO @x402/mcp _meta['x402/payment'] roundtrip, ERC-8021 helper, immutable Glama claim & v3.13.2 guards verified.`);
+  process.exit(0);
+})().catch((err) => {
+  console.error("[TEST FAILED]", err);
+  process.exit(1);
+});

@@ -1,11 +1,12 @@
 {
   "name": "ingravity-security",
   "mcpName": "io.github.DMS1979/ingravity-security",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Self-contained Node.js Model Context Protocol (MCP 2025-06-18) STDIO Server for 5-EVM Web3 Security: local EVM calldata decoding, ERC-8021 attribution, $0.01 Fast-Ping, $0.10 Pre-Flight Firewall, live RPC Token Honeypot Scanner & 24-vector Solidity Auditor via x402 v2 Base USDC.",
   "main": "index.js",
   "types": "index.d.ts",
   "bin": {
+    "ingravity-security": "mcp.js",
     "ingravity-mcp": "mcp.js"
   },
   "files": [
