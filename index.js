@@ -1,12 +1,12 @@
 /**
- * INGRAVITY SECURITY SDK (ingravity-security) v1.3.0
+ * INGRAVITY SECURITY SDK (ingravity-security) v1.3.2
  * -----------------------------------------------------------------------
  * Autonomous 5-EVM Web3 Security, $0.01 Fast-Ping, Pre-Flight Transaction Firewall,
  * Live EVM RPC Token Honeypot Scanner, ERC-8021 Attribution & Atomic EIP-5792
  * Safe-Harbor Rescue Provider for Coinbase AgentKit, ElizaOS, LangChain & MCP
  * on Base (8453), Arbitrum (42161), Optimism (10), Polygon (137), and Ethereum (1).
  *
- * Official x402 v2 Catalog (Swarm v3.13.0):
+ * Official x402 v2 Catalog (Swarm v3.13.2):
  *  - Zero Free Verdict Leaks: 100% deterministic paid x402 v2 endpoints
  *  - Settlement Network: Base Mainnet (eip155:8453)
  *  - Payee (Trust Wallet): 0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f
@@ -22,7 +22,7 @@ const BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const BASE_CHAIN_ID = 8453;
 const ERC8021_BUILDER_CODE = "bc_i26d7owr";
 const ERC8021_SUFFIX_HEX = "0b62635f69323664376f77720080218021802180218021802180218021";
-const SDK_VERSION = "1.3.1";
+const SDK_VERSION = "1.3.2";
 
 function encodeErc8021Calldata(calldataHex = "0x") {
   const clean = String(calldataHex || "0x").trim();
