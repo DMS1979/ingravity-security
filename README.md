@@ -2,8 +2,9 @@
 
 Self-contained, zero-dependency **Model Context Protocol (`MCP 2025-06-18`) STDIO Server** implemented in Node.js (`mcp.js`) for 5-EVM Web3 pre-flight security, EVM calldata structural decoding, ERC-8021 Base Builder attribution, live RPC token honeypot scanning, BigInt DeFi MEV slippage math, and 24-vector Solidity auditing across **Base (`8453`)**, **Arbitrum (`42161`)**, **Optimism (`10`)**, **Polygon (`137`)**, and **Ethereum (`1`)**.
 
-[![npm version](https://img.shields.io/badge/npm-1.3.3-blue.svg)](https://www.npmjs.com/package/ingravity-security)
+[![npm version](https://img.shields.io/badge/npm-1.3.4-blue.svg)](https://www.npmjs.com/package/ingravity-security)
 [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/dms1979/ingravity-security)
+[![Ingravity Autonomous EVM Security & DeFi Guard (x402 v2) MCP server](https://mcprush.com/badge/ingravity-autonomous-evm-security-defi-guard-mcp/card.svg)](https://mcprush.com/to/ingravity-autonomous-evm-security-defi-guard-mcp?ref=badge)
 [![Glama MCP Server](https://glama.ai/mcp/servers/DMS1979/ingravity-security/badges/score.svg)](https://glama.ai/mcp/servers/DMS1979/ingravity-security)
 [![MCP Spec](https://img.shields.io/badge/MCP-2025--06--18-6366F1.svg)](https://modelcontextprotocol.io)
 [![Network](https://img.shields.io/badge/Network-Base%20Mainnet%20(8453)-0052FF.svg)](https://basescan.org)
@@ -24,14 +25,20 @@ This repository contains the complete, runnable **STDIO MCP Server (`mcp.js`)** 
 
 ---
 
-## Quickstart (Run Locally via Docker or NPX)
+## Quickstart (5-Line x402 Auto-Pay, MCP & Docker)
 
-### Option 1: Docker
+### Option 1: 5-Line Autonomous Bot Pre-Swap Gate (`@x402/fetch` on Base `eip155:8453`)
 
-```bash
-docker build -t ingravity-security-mcp .
-docker run -i --rm ingravity-security-mcp
+```js
+import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
+import { registerExactEvmScheme } from "@x402/evm/exact/client";
+import { privateKeyToAccount } from "viem/accounts";
+const client = new x402Client();
+registerExactEvmScheme(client, { signer: privateKeyToAccount(process.env.EVM_PRIVATE_KEY) });
+const res = await wrapFetchWithPayment(fetch, client)("https://red-shape-1b3b.daviddelmoral79.workers.dev/api/v1/fast-ping?address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chainId=8453");
 ```
+
+*(Need `npm i @x402/fetch @x402/evm viem`, or use CLI `npx agentcash fetch "https://red-shape-1b3b.daviddelmoral79.workers.dev/api/v1/fast-ping?address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chainId=8453"`.)*
 
 ### Option 2: Claude Desktop / Cursor / Windsurf (`npx`)
 
@@ -42,13 +49,20 @@ Add this entry to your MCP client configuration (`claude_desktop_config.json` or
   "mcpServers": {
     "ingravity-security": {
       "command": "npx",
-      "args": ["-y", "-p", "ingravity-security@1.3.2", "ingravity-mcp"],
+      "args": ["-y", "-p", "ingravity-security@1.3.4", "ingravity-mcp"],
       "env": {
         "INGRAVITY_AGENT_BUDGET": "0.10"
       }
     }
   }
 }
+```
+
+### Option 3: Docker
+
+```bash
+docker build -t ingravity-security-mcp .
+docker run -i --rm ingravity-security-mcp
 ```
 
 ### Optional Environment Variables

@@ -2,8 +2,8 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Ingravity Autonomous EVM Security & DeFi Intelligence Swarm",
-    "version": "3.13.0",
-    "description": "v3.13.0 Multichain (5 EVM: Base, Arbitrum, Optimism, Polygon, Ethereum) Autonomous Web3 Security Swarm: $0.01 binary Fast-Ping + $0.04-$0.12 Token Honeypot & MEV Math + Services 2-7 ($0.04-$45.00 floor plus +0.15% Pre-Flight SLA & 5%-10% Whitehat Safe-Harbor Rescue Bounty on saved capital with Anti-Bypass Seal on CRITICAL/HIGH remediation patches), settled per call via x402 v2 (USDC on Base).",
+    "version": "3.14.0",
+    "description": "v3.14.0 Multichain (5 EVM: Base, Arbitrum, Optimism, Polygon, Ethereum) Autonomous Web3 Security Swarm: $0.01 binary Fast-Ping + $0.04-$0.12 Token Honeypot & MEV Math + Services 2-7 ($0.04-$45.00 floor plus +0.15% Pre-Flight SLA & 5%-10% Whitehat Safe-Harbor Rescue Bounty on saved capital with Anti-Bypass Seal on CRITICAL/HIGH remediation patches), settled per call via x402 v2 (USDC on Base).",
     "contact": {
       "name": "David del Moral — Founder & Lead Security Researcher",
       "email": "daviddelmoral79@gmail.com",
@@ -135,7 +135,7 @@
   "paths": {
     "/api/v1/fast-ping": {
       "get": {
-        "operationId": "fastPingAddressSafetyGet",
+        "operationId": "base_token_honeypot_check",
         "tags": [
           "Honeypot Check",
           "Token Safety",
@@ -145,7 +145,7 @@
           "Fast Ping",
           "Base x402"
         ],
-        "summary": "$0.01 USDC Instant Token Honeypot, Rugpull & Address Safety Check Before Swapping (Binary SAFE/DANGER, GET/POST)",
+        "summary": "Base token honeypot, rugpull & EVM address safety check ($0.01 USDC, GET/POST)",
         "description": "Designed for high-frequency trading bots and autonomous agents (maxAutoPay <= $0.05 USDC). Supports both HTTP GET (?address=0x...&chainId=8453) and POST JSON to check any ERC-20 tokenAddress or spender for honeypot traps and drainers before swapping across 5 EVM chains (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) with zero forensic leakage. Upgrade to GET/POST /api/v1/token-rug-scanner ($0.04 Signal / $0.12 Full) or /api/v1/tx-firewall ($0.10 USDC) for sell-simulation & Safe-Harbor calldata. Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
         "parameters": [
           {
@@ -312,7 +312,7 @@
         }
       },
       "post": {
-        "operationId": "fastPingAddressSafety",
+        "operationId": "base_token_safety",
         "tags": [
           "Honeypot Check",
           "Token Safety",
@@ -322,7 +322,7 @@
           "Fast Ping",
           "Base x402"
         ],
-        "summary": "$0.01 USDC Instant Token Honeypot, Rugpull & Address Safety Check Before Swapping (Binary SAFE/DANGER, GET/POST)",
+        "summary": "Base token safety check (honeypot, rugpull & drainer gate, $0.01 USDC POST)",
         "description": "Designed for high-frequency trading bots and autonomous agents (maxAutoPay <= $0.05 USDC). Supports both HTTP GET (?address=0x...&chainId=8453) and POST JSON to check any ERC-20 tokenAddress or spender for honeypot traps and drainers before swapping across 5 EVM chains (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) with zero forensic leakage. Upgrade to GET/POST /api/v1/token-rug-scanner ($0.04 Signal / $0.12 Full) or /api/v1/tx-firewall ($0.10 USDC) for sell-simulation & Safe-Harbor calldata.",
         "requestBody": {
           "required": true,
@@ -488,14 +488,14 @@
     },
     "/api/v1/audit-solidity": {
       "post": {
-        "operationId": "auditSolidityContract",
+        "operationId": "smart_contract_audit",
         "tags": [
           "Solidity Security",
           "Smart Contract Audit",
           "ERC-4626",
           "24 SWC Vectors"
         ],
-        "summary": "Deterministic 24-Vector Solidity Audit & Safe-Harbor Guard ($0.85 Floor / $0.35 Signal + 0.15% SLA / 5%-10% Rescue, Anti-Bypass)",
+        "summary": "Smart contract audit (Solidity 24 vectors + Safe-Harbor TVL rescue, $0.85 Floor + 0.15%/5%-10%)",
         "description": "Deterministic O(N) lexical sanitization + 4-Gate Institutional Anti-Rejection Filter (excludes sub-unit dust rounding & trusted-admin paths) covering 24 SWC/DeFi attack vectors across 5 EVM chains. Base $0.85 USDC ($0.35 Signal) confirms vulnerability verdict & severity; Anti-Bypass Seal keeps exact line coordinates & remediation patches for CRITICAL/HIGH exploits sealed behind the +0.15% SLA or 5%-10% Atomic Safe-Harbor rescue split (90%-95% to owner treasury, 5%-10% whitehat bounty on saved capital).",
         "requestBody": {
           "required": true,
@@ -749,14 +749,14 @@
     },
     "/api/v1/tx-firewall": {
       "get": {
-        "operationId": "inspectEvmTransactionFirewallGet",
+        "operationId": "wallet_drainer_check",
         "tags": [
           "EVM Firewall",
           "Wallet Drainer Protection",
           "Permit2",
           "EIP-1967 Storage"
         ],
-        "summary": "Pre-Flight EVM Firewall & Live 5-EVM RPC Forensics ($0.10 Floor + 0.15% Pre-Flight / 5%-10% Safe-Harbor Rescue, Anti-Bypass)",
+        "summary": "Wallet drainer check & ERC-20 approval spender firewall on Base & 5 EVMs ($0.10 USDC + Safe-Harbor Rescue)",
         "description": "Live Multichain EVM RPC inspection (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1: eth_getCode + EIP-1967 storage slots) + Ready-to-sign EIP-5792 / sequential EOA revocation calldata. Hybrid Pricing: $0.10 USDC base floor (<$200 USD), plus +0.15% Pre-Flight protection / 5%-10% Whitehat Safe-Harbor rescue bounty (Anti-Bypass Seal locks compromised spender & rescue calldata on active critical threats until bounty settlement). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
         "parameters": [
           {
@@ -1054,8 +1054,7 @@
                   }
                 },
                 "required": [
-                  "to",
-                  "data"
+                  "to"
                 ]
               },
               "example": {
@@ -1229,7 +1228,7 @@
     },
     "/api/v1/defi-math-guard": {
       "get": {
-        "operationId": "computeDefiSlippageAndLiquidationGet",
+        "operationId": "mev_protection",
         "tags": [
           "DeFi Math",
           "MEV Sandwich Protection",
@@ -1237,15 +1236,16 @@
           "BigInt Precision",
           "Pre-Swap Check"
         ],
-        "summary": "Exact BigInt AMM Slippage, MEV Sandwich & Liquidation Guard ($0.10 Floor / $0.04 Signal + 0.15% Swap / 5%-10% Rescue, Anti-Bypass)",
+        "summary": "MEV protection, DeFi AMM slippage & liquidation guard ($0.10 Full / $0.04 Signal + Rescue)",
         "description": "48-step exact BigInt binary search for optimal MEV sandwich vectors and mathematically provable minAmountOut (supports GET query params & POST JSON). Hybrid Pricing: $0.10 USDC base floor ($0.04 Signal Only), plus +0.15% Pre-Flight swap protection or 5%-10% Whitehat Safe-Harbor commission on capital rescued from critical MEV/liquidation exposure (Anti-Bypass Seal applies to CRITICAL/HIGH remediation fixes when saving exposed live liquidity). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
         "parameters": [
           {
             "name": "reserveIn",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
+              "default": "500000000000000000000",
               "example": "500000000000000000000"
             },
             "description": "Pool input reserve in atomic base units (required with reserveOut & amountIn for AMM math)."
@@ -1253,9 +1253,10 @@
           {
             "name": "reserveOut",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
+              "default": "1250000000000",
               "example": "1250000000000"
             },
             "description": "Pool output reserve in atomic base units."
@@ -1263,9 +1264,10 @@
           {
             "name": "amountIn",
             "in": "query",
-            "required": false,
+            "required": true,
             "schema": {
               "type": "string",
+              "default": "25000000000000000000",
               "example": "25000000000000000000"
             },
             "description": "Proposed swap input amount in atomic base units."
@@ -1458,7 +1460,7 @@
                 "properties": {
                   "amm": {
                     "type": "object",
-                    "description": "Optional constant-product AMM swap parameters (reserveIn, reserveOut, amountIn required when included; evaluated independently of leverage; supply amm, leverage, or both).",
+                    "description": "Constant-product AMM swap parameters (reserveIn, reserveOut, amountIn required when non-empty; pass {} when evaluating 'leverage'-only mode).",
                     "properties": {
                       "reserveIn": {
                         "type": "string",
@@ -1548,7 +1550,10 @@
                     "default": "FULL",
                     "description": "Billing & output depth: FULL ($0.10 USDC) returns exact amm and leverage structures; ESSENTIAL ($0.04 USDC) returns top-level action, signal, and savedCapitalEstimateUsd only."
                   }
-                }
+                },
+                "required": [
+                  "amm"
+                ]
               },
               "example": {
                 "amm": {
@@ -1671,7 +1676,7 @@
     },
     "/api/v1/token-rug-scanner": {
       "get": {
-        "operationId": "scanTokenRugpullAndHoneypotGet",
+        "operationId": "rugpull_token_safety_evm",
         "tags": [
           "Honeypot Detection",
           "Token Safety",
@@ -1680,7 +1685,7 @@
           "Live 5-EVM RPC Bytecode",
           "EIP-1167 Clones"
         ],
-        "summary": "5-EVM Token Honeypot & Bytecode/Proxy Forensics ($0.12 Full / $0.04 Signal + 0.15% Position / 5%-10% Rescue, Anti-Bypass, GET/POST)",
+        "summary": "ERC-20 token rugpull, honeypot & LP safety check on Base & 5 EVMs ($0.12 Full / $0.04 Signal + Rescue)",
         "description": "Audits any EVM token (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) directly by tokenAddress (0x...) via GET query or POST JSON without requiring Solidity source code! Performs live RPC bytecode selector disassembly (blacklist, hidden mint, dynamic sell tax, pause switches), EIP-1967/EIP-1167 proxy implementation inspection, plus 14-rule AST analysis when optional .sol code is supplied. Hybrid Pricing: $0.12 USDC Full Report ($0.04 Signal Only) + 0.15% Pre-Flight / 5%-10% Safe-Harbor rescue split on saved capital (Anti-Bypass Seal on salvageable CRITICAL/HIGH fixes). Also accepts HTTP GET query parameters for zero-body AgentCash / curl invocations.",
         "parameters": [
           {
@@ -1902,7 +1907,7 @@
         }
       },
       "post": {
-        "operationId": "scanTokenRugpullAndHoneypot",
+        "operationId": "rugpull_detection",
         "tags": [
           "Honeypot Detection",
           "Token Safety",
@@ -1911,7 +1916,7 @@
           "Live 5-EVM RPC Bytecode",
           "EIP-1167 Clones"
         ],
-        "summary": "5-EVM Token Honeypot & Bytecode/Proxy Forensics ($0.12 Full / $0.04 Signal + 0.15% Position / 5%-10% Rescue, Anti-Bypass, GET/POST)",
+        "summary": "Rugpull detection & 5-EVM ERC-20 honeypot/bytecode scanner ($0.12 Full / $0.04 Signal + Rescue)",
         "description": "Audits any EVM token (Base 8453, Arbitrum 42161, Optimism 10, Polygon 137, Ethereum 1) directly by tokenAddress (0x...) via GET query or POST JSON without requiring Solidity source code! Performs live RPC bytecode selector disassembly (blacklist, hidden mint, dynamic sell tax, pause switches), EIP-1967/EIP-1167 proxy implementation inspection, plus 14-rule AST analysis when optional .sol code is supplied. Hybrid Pricing: $0.12 USDC Full Report ($0.04 Signal Only) + 0.15% Pre-Flight / 5%-10% Safe-Harbor rescue split on saved capital (Anti-Bypass Seal on salvageable CRITICAL/HIGH fixes).",
         "requestBody": {
           "required": true,
@@ -1922,7 +1927,7 @@
                 "properties": {
                   "tokenAddress": {
                     "type": "string",
-                    "description": "Deployed 42-char EVM ERC-20 contract address (0x...) inspected via live RPC bytecode & proxy slots (no Solidity source required). Provide tokenAddress, code, or both."
+                    "description": "Deployed 42-char EVM ERC-20 contract address (0x...) inspected via live RPC bytecode & proxy slots (pass '' when auditing pre-deploy Solidity 'code' only)."
                   },
                   "chainId": {
                     "type": "integer",
@@ -1953,7 +1958,10 @@
                     "default": "FULL",
                     "description": "Billing & output depth: FULL ($0.12 USDC) returns sellSimulation, liveOnChainForensics, risk pillars, and forensicEvidence; ESSENTIAL ($0.04 USDC) returns verdict, canSell, score, and action scalars only."
                   }
-                }
+                },
+                "required": [
+                  "tokenAddress"
+                ]
               },
               "example": {
                 "tokenAddress": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",

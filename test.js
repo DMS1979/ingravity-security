@@ -15,7 +15,7 @@ const { forwardMcpLine, MCP_ENDPOINT_URL } = require("./mcp.js");
 
 console.log(`[TEST] Testing Ingravity Security SDK v${SDK_VERSION} exports...`);
 
-assert.strictEqual(SDK_VERSION, "1.3.3", "SDK_VERSION must be 1.3.3");
+assert.strictEqual(SDK_VERSION, "1.3.4", "SDK_VERSION must be 1.3.4");
 assert.ok(IngravitySecurityActionProvider, "IngravitySecurityActionProvider must be exported");
 assert.ok(ingravityElizaPlugin, "ingravityElizaPlugin must be exported");
 assert.strictEqual(ERC8021_BUILDER_CODE, "bc_i26d7owr");
@@ -23,7 +23,7 @@ assert.strictEqual(typeof forwardMcpLine, "function", "mcp.js forwardMcpLine mus
 assert.ok(MCP_ENDPOINT_URL.endsWith("/mcp"), "MCP_ENDPOINT_URL must point to /mcp");
 
 const provider = new IngravitySecurityActionProvider();
-assert.strictEqual(provider.version, "1.3.3");
+assert.strictEqual(provider.version, "1.3.4");
 assert.strictEqual(provider.enableReceiptCache, true);
 assert.strictEqual(typeof provider.clearReceiptCache, "function");
 
@@ -76,8 +76,8 @@ const mcpIdx = workerSrc.indexOf('url.pathname === "/mcp"', fetchStart);
 assert.ok(fetchStart > 0 && claimIdx > fetchStart && rootClaimIdx > fetchStart, "Both Glama verification paths must be routed in handleFetchRequest");
 assert.ok(claimIdx < internalSyncIdx && claimIdx < mcpIdx, "Glama ownership claim must execute BEFORE auth-gated internal routes, /mcp, and x402 paywalls");
 
-// Compact PAYMENT-REQUIRED HTTP header & v3.13.2 Swarm conversion guards
-assert.ok(workerSrc.includes('const SWARM_VERSION = "3.13.2"'), "Worker must declare SWARM_VERSION = 3.13.2");
+// Compact PAYMENT-REQUIRED HTTP header & v3.14.0 Swarm conversion guards
+assert.ok(workerSrc.includes('const SWARM_VERSION = "3.14.0"'), "Worker must declare SWARM_VERSION = 3.14.0");
 assert.ok(!workerSrc.includes("open-source engine code on GitHub"), "IP guard: must not claim proprietary engine is open-source");
 assert.ok(workerSrc.includes("open-source SDK &amp; verifiable manifests on GitHub"), "IP guard: must state open-source SDK & verifiable manifests");
 assert.ok(workerSrc.includes("ttlSeconds: 48 * 3600"), "Canary trial TTL must default to 48 hours");
@@ -85,17 +85,19 @@ assert.ok(workerSrc.includes("function getCapitalBandFloorUsd("), "Side-channel 
 assert.ok(workerSrc.includes("function validateSignedPaymentTerms("), "x402 guard: must validate payTo, asset and amount server-side");
 assert.ok(workerSrc.includes("function buildEip3009SigningDiagnostics("), "x402 guard: must emit EIP-3009 signing diagnostics");
 
-// Official MCP Registry 1.3.3 coherence guards
+// Official MCP Registry 1.3.4 coherence & Fase 1 Edge speed guards
 const pkgDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
 const sdkServerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "server.json"), "utf8"));
 const rootServerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "mcp_registry_server.json"), "utf8"));
-assert.strictEqual(pkgDoc.version, "1.3.3", "package.json version must be 1.3.3");
+const readmeDoc = fs.readFileSync(path.join(__dirname, "README.md"), "utf8");
+assert.strictEqual(pkgDoc.version, "1.3.4", "package.json version must be 1.3.4");
 assert.strictEqual(pkgDoc.mcpName, "io.github.DMS1979/ingravity-security", "package.json must declare mcpName");
 assert.strictEqual(pkgDoc.bin["ingravity-security"], "mcp.js", "package.json bin must expose ingravity-security");
 assert.strictEqual(pkgDoc.bin["ingravity-mcp"], "mcp.js", "package.json bin must expose ingravity-mcp");
-assert.strictEqual(sdkServerDoc.version, "1.3.3", "sdk server.json version must be 1.3.3");
-assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.3", "sdk server.json npm package version must be 1.3.3");
+assert.strictEqual(sdkServerDoc.version, "1.3.4", "sdk server.json version must be 1.3.4");
+assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.4", "sdk server.json npm package version must be 1.3.4");
 assert.deepStrictEqual(sdkServerDoc, rootServerDoc, "sdk server.json and mcp_registry_server.json must be identical");
+assert.ok(readmeDoc.includes("wrapFetchWithPayment") && readmeDoc.includes("mcprush.com/badge"), "README.md must include 5-line x402 snippet and mcprush badge");
 assert.ok(workerSrc.includes('usdPrice: "0.01"') && (workerSrc.includes('atomicAmount: "10000"') || workerSrc.includes('amount: "10000"')), "Fast-Ping must use $0.01 (10000 atomic USDC)");
 assert.ok(workerSrc.includes("function normalizeCaip2Network("), "Worker must normalize CAIP-2 network aliases to eip155:8453");
 assert.ok(workerSrc.includes("function encodeCompactPaymentRequiredHeader("), "Worker must define encodeCompactPaymentRequiredHeader helper");
@@ -197,7 +199,7 @@ assert.ok(compactLvl2Slice.includes("output: {\n              type: \"object\"")
     server.close();
   }
 
-  console.log(`[TEST PASSED] v${SDK_VERSION}: ${actions.length} paid actions ($0.01 Fast-Ping), ${ingravityElizaPlugin.actions.length} Eliza actions, STDIO @x402/mcp _meta['x402/payment'] roundtrip, ERC-8021 helper, immutable Glama claim & v3.13.2 guards verified.`);
+  console.log(`[TEST PASSED] v${SDK_VERSION}: ${actions.length} paid actions ($0.01 Fast-Ping), ${ingravityElizaPlugin.actions.length} Eliza actions, STDIO @x402/mcp _meta['x402/payment'] roundtrip, ERC-8021 helper, immutable Glama claim & v3.14.0 guards verified.`);
   process.exit(0);
 })().catch((err) => {
   console.error("[TEST FAILED]", err);

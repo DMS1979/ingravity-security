@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ingravity Security MCP Server (v1.3.3 — Model Context Protocol 2025-06-18 + x402 v2 MCP Transport)
+ * Ingravity Security MCP Server (v1.3.4 — Model Context Protocol 2025-06-18 + x402 v2 MCP Transport)
  * ----------------------------------------------------------------------------
  * Self-contained, zero-dependency Node.js STDIO MCP Server implementation.
  *
@@ -20,7 +20,7 @@ const readline = require("readline");
 const { encodeErc8021Calldata, ERC8021_BUILDER_CODE, ERC8021_SUFFIX_HEX } = require("./index.js");
 
 const SERVER_NAME = "ingravity-security";
-const SERVER_VERSION = "1.3.3";
+const SERVER_VERSION = "1.3.4";
 const DEFAULT_API_URL = (
   process.env.INGRAVITY_API_URL ||
   process.env.INGRAVITY_WORKER_URL ||
