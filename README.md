@@ -4,7 +4,7 @@ Self-contained, zero-dependency **Model Context Protocol (`MCP 2025-06-18`) STDI
 
 [![npm version](https://img.shields.io/badge/npm-1.3.4-blue.svg)](https://www.npmjs.com/package/ingravity-security)
 [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/dms1979/ingravity-security)
-[![Ingravity Autonomous EVM Security & DeFi Guard (x402 v2) MCP server](https://mcprush.com/badge/ingravity-autonomous-evm-security-defi-guard-mcp/card.svg)](https://mcprush.com/to/ingravity-autonomous-evm-security-defi-guard-mcp?ref=badge)
+[![mcprush Grade A](https://mcprush.com/badge/ingravity-autonomous-evm-security-defi-guard-mcp/compact.svg)](https://mcprush.com/to/ingravity-autonomous-evm-security-defi-guard-mcp?ref=badge)
 [![Glama MCP Server](https://glama.ai/mcp/servers/DMS1979/ingravity-security/badges/score.svg)](https://glama.ai/mcp/servers/DMS1979/ingravity-security)
 [![MCP Spec](https://img.shields.io/badge/MCP-2025--06--18-6366F1.svg)](https://modelcontextprotocol.io)
 [![Network](https://img.shields.io/badge/Network-Base%20Mainnet%20(8453)-0052FF.svg)](https://basescan.org)
