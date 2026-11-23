@@ -111,7 +111,7 @@ docker run -i --rm ingravity-security-mcp
 
 ---
 
-## Programmatic Library Usage (Coinbase AgentKit & ElizaOS)
+## Programmatic Library Usage (Base Trading Bots, Coinbase AgentKit & ElizaOS)
 
 In addition to the standalone MCP server (`mcp.js`), the package exports `IngravitySecurityActionProvider`, `ingravityElizaPlugin`, and `encodeErc8021Calldata` from `index.js`:
 
@@ -119,15 +119,26 @@ In addition to the standalone MCP server (`mcp.js`), the package exports `Ingrav
 npm install ingravity-security
 ```
 
-```typescript
-import { IngravitySecurityActionProvider } from "ingravity-security";
+### 10-Line Base Pre-Swap Guard (Aerodrome & Uniswap Trading Bots)
 
-const provider = new IngravitySecurityActionProvider({
-  walletProvider: evmWalletProvider,
-  maxSpendUsdc: 0.10,
-  enableReceiptCache: true
-});
+Block honeypots, hidden tax traps, and malicious approvals **before signing** on Base (`8453`) for `$0.01–$0.04 USDC`:
+
+```javascript
+const { IngravitySecurityActionProvider } = require("ingravity-security");
+
+async function safeSwapOnBase(walletProvider, tokenOut, router, swapCalldata) {
+  const guard = new IngravitySecurityActionProvider({ walletProvider, maxSpendUsdc: 0.05 });
+  const ping = await guard.fastPing({ address: tokenOut, chainId: 8453 }); // $0.01 USDC
+  if (ping.action === "ABORT" || ping.verdict === "DANGER") throw new Error("Blocked drainer/honeypot");
+  const scan = await guard.tokenRugScanner({ tokenAddress: tokenOut, chainId: 8453, tier: "ESSENTIAL" }); // $0.04
+  if (scan.action === "ABORT" || /HIGH_RUG_RISK|CRITICAL_HONEYPOT/.test(scan.verdict)) {
+    throw new Error(`Swap aborted: ${scan.verdict}`);
+  }
+  return { safeToBroadcast: true, router, swapCalldata }; // Aerodrome 0xcF77...4E43 / Uniswap 0x2626...e481
+}
 ```
+
+See [examples/base_preswap_aerodrome_uniswap.js](examples/base_preswap_aerodrome_uniswap.js) for a runnable template with optional `txFirewall` calldata verification (`$0.10 USDC`).
 
 ---
 
