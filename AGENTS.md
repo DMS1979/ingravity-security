@@ -1,19 +1,27 @@
-# Ingravity Autonomous EVM Security & DeFi Guard v3.14.0
+# Ingravity Autonomous EVM Security & DeFi Guard v3.14.0 (`ingravity-security@1.3.5`)
 
 Machine-to-machine (M2M) pre-swap honeypot detection, transaction firewall, AMM/MEV math guard, Solidity contract auditing, and Safe-Harbor rescue across 5 EVM chains (`Base 8453`, `Arbitrum 42161`, `Optimism 10`, `Polygon 137`, `Ethereum 1`).
 
 ## Cryptographic Provenance & Zero-Custody Verification
 - Canonical Gateway: https://red-shape-1b3b.daviddelmoral79.workers.dev
 - Open-Source SDK & Verifiable Manifests Repository: https://github.com/DMS1979/ingravity-security
-- Official NPM Package: https://www.npmjs.com/package/ingravity-security (ingravity-security@1.3.4)
+- Official NPM Package: https://www.npmjs.com/package/ingravity-security (`ingravity-security@1.3.5`)
 - On-Chain Agent Identity: ERC-8004 Agent #10252 on Base (https://www.8004scan.io/agents/base/10252)
 - Base Mainnet Treasury (PayTo): 0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f (https://basescan.org/address/0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f#tokentxns)
 - Settlement Asset: Base Mainnet USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
 - Base Builder Attribution Code: bc_i26d7owr
 - Zero-Custody Guarantee: Every x402 payment or Safe-Harbor settlement uses strict USDC EIP-3009 `transferWithAuthorization` or ERC-20 `transfer(0xa9059cbb)`. Ingravity NEVER requests `ERC-20 approve()` to itself.
 
-## Quickstart (5-Line Autonomous Auto-Pay + AgentCash + curl)
-### Option 1: 5-Line Copy-Paste Node.js Auto-Pay (`@x402/fetch` on Base `eip155:8453`)
+## Quickstart (Zero-Dependency Auto-Pay + `@x402/fetch` + MCP)
+### Option 1: Zero-Dependency 4-Line Node.js Auto-Pay (`ingravity-security@1.3.5`)
+```js
+const { IngravitySecurityActionProvider } = require("ingravity-security");
+const guard = new IngravitySecurityActionProvider({ privateKey: process.env.INGRAVITY_PRIVATE_KEY, maxSpendUsdc: 0.05 });
+const ping = await guard.fastPing({ address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", chainId: 8453 }); // $0.01 USDC
+```
+*(Also supports Viem `Account`/`WalletClient`, Ethers v5/v6 `Wallet`, and Coinbase AgentKit `walletProvider`.)*
+
+### Option 2: 5-Line `@x402/fetch` Auto-Pay on Base (`eip155:8453`)
 ```js
 import { wrapFetchWithPayment, x402Client } from "@x402/fetch";
 import { registerExactEvmScheme } from "@x402/evm/exact/client";
@@ -22,14 +30,10 @@ const client = new x402Client();
 registerExactEvmScheme(client, { signer: privateKeyToAccount(process.env.EVM_PRIVATE_KEY) });
 const res = await wrapFetchWithPayment(fetch, client)("https://red-shape-1b3b.daviddelmoral79.workers.dev/api/v1/fast-ping?address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chainId=8453");
 ```
-### Option 2: HTTP GET CLI (`AgentCash` / `npx` MCP STDIO)
+
+### Option 3: MCP STDIO Server (with optional local EIP-3009 auto-pay)
 ```bash
-npx agentcash fetch "https://red-shape-1b3b.daviddelmoral79.workers.dev/api/v1/fast-ping?address=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&chainId=8453"
-npx -y -p ingravity-security@1.3.4 ingravity-mcp
-```
-### Option 3: HTTP POST JSON (Full Forensics / Firewall / Solidity / Rescue)
-```bash
-curl -X POST "https://red-shape-1b3b.daviddelmoral79.workers.dev/api/v1/tx-firewall" -H "Content-Type: application/json" -d '{"to":"0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913","data":"0x","chainId":8453}'
+INGRAVITY_PRIVATE_KEY=0x... INGRAVITY_AGENT_BUDGET=0.10 npx -y -p ingravity-security@1.3.5 ingravity-mcp
 ```
 
 ## Monetized Endpoints (x402 v2 on Base Mainnet `eip155:8453`)

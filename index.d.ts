@@ -2,6 +2,7 @@ export interface IngravityConfig {
   workerUrl?: string;
   payToWallet?: string;
   walletProvider?: any;
+  privateKey?: string;
   maxSpendUsdc?: number;
   capitalAtRiskUsd?: number;
   enableReceiptCache?: boolean;
@@ -92,8 +93,17 @@ export interface WalletBlindAuditParams {
   wallet: string;
 }
 
+export interface Eip3009PrivateKeySigner {
+  address: string;
+  getAddress(): Promise<string>;
+  signTypedData(typedDataOrDomain: any, maybeTypes?: any, maybeValue?: any): Promise<string>;
+}
+
 export function encodeErc8021Calldata(calldataHex?: string): string;
 export function sanitizeX402V2Accept<T extends Record<string, any>>(accept: T): Omit<T, "maxAmountRequired">;
+export function createEip3009PrivateKeySigner(privateKeyHex: string): Eip3009PrivateKeySigner;
+export function deriveAddressFromPrivateKey(privateKeyHex: string): string;
+export function keccak256Hex(input: Buffer | Uint8Array | string): string;
 
 export class IngravitySecurityActionProvider {
   constructor(config?: IngravityConfig);

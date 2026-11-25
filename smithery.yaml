@@ -1,22 +1,56 @@
-# Smithery.ai Remote Streamable-HTTP MCP Server Manifest
-# Ready for registration at https://smithery.ai/new or via smithery mcp publish
+# Ingravity EVM Security MCP Server Manifest (v1.3.5 / Swarm v3.14.0)
+# Canonical registries:
+#   - Official MCP Registry: io.github.DMS1979/ingravity-security (v1.3.5)
+#   - Glama Servers: https://glama.ai/mcp/servers/DMS1979/ingravity-security
+#   - NPM (Self-contained STDIO MCP 2025-06-18): npx -y -p ingravity-security@1.3.5 ingravity-mcp
+#   - Direct Streamable-HTTP MCP Endpoint: https://red-shape-1b3b.daviddelmoral79.workers.dev/mcp
 name: ingravity-evm-security-mcp
-displayName: Ingravity EVM Security & Anti-Drainer Firewall v3.13 (5 EVM x402)
+displayName: Ingravity EVM Security & Anti-Drainer Firewall v3.14 ($0.01 x402)
+version: 1.3.5
 description: >-
-  Swarm v3.13.0 across 5 EVM chains (Base, Arbitrum, Optimism, Polygon, Ethereum): $0.01 USDC binary Fast-Ping,
-  $0.04/$0.12 live RPC token honeypot/rugpull scanner by tokenAddress (GET/POST), $0.04/$0.10 BigInt DeFi MEV guard,
-  $0.10 pre-sign EVM transaction firewall, and 24-vector Solidity audit ($0.35-$45.00) with +0.15% Pre-Flight SLA &
-  5%-10% Whitehat Safe-Harbor Rescue Bounty (Anti-Bypass Seal on Services 2-7). Zero free verdict leaks; STDIO bridge
-  available via `npx -y --package=ingravity-security ingravity-mcp` (v1.3.0).
+  Zero-dependency MCP 2025-06-18 server for 5-EVM (Base, Arbitrum, Optimism, Polygon, Ethereum) pre-sign transaction
+  security: local EVM calldata selector decoder & ERC-8021 attribution utilities plus 7 live x402 v2 Base USDC engines
+  ($0.01 Fast-Ping, $0.10 Transaction Firewall, $0.04/$0.12 live RPC Token Honeypot Scanner, $0.04/$0.10 BigInt DeFi
+  MEV Guard, $0.35-$45.00 24-vector Solidity Audit & Protocol Dossier). Supports zero-custody local EIP-3009 auto-pay.
 homepage: https://red-shape-1b3b.daviddelmoral79.workers.dev
+repository: https://github.com/DMS1979/ingravity-security
 transport:
   type: streamable-http
   url: https://red-shape-1b3b.daviddelmoral79.workers.dev/mcp
 startCommand:
-  type: http
+  type: stdio
   configSchema:
     type: object
-    properties: {}
+    properties:
+      INGRAVITY_PRIVATE_KEY:
+        type: string
+        description: Optional local EVM private key (0x...) for automatic zero-custody EIP-3009 USDC settlement up to INGRAVITY_AGENT_BUDGET.
+      INGRAVITY_AGENT_BUDGET:
+        type: string
+        default: "0.10"
+        description: Maximum USDC spend cap per call (X-Agent-Budget).
+      INGRAVITY_API_URL:
+        type: string
+        default: https://red-shape-1b3b.daviddelmoral79.workers.dev
+        description: Override the default Ingravity REST API v1 base URL.
+      INGRAVITY_RECEIPT_TOKEN:
+        type: string
+        description: Optional reusable session receipt token (X-Ingravity-Receipt-Token).
+      INGRAVITY_PAYMENT_SIGNATURE:
+        type: string
+        description: Optional pre-signed Base64 EIP-3009 x402 v2 PAYMENT-SIGNATURE authorization.
+  commandFunction: |-
+    (config) => ({
+      command: 'npx',
+      args: ['-y', '--package=ingravity-security@1.3.5', 'ingravity-mcp'],
+      env: {
+        ...(config.INGRAVITY_PRIVATE_KEY ? { INGRAVITY_PRIVATE_KEY: config.INGRAVITY_PRIVATE_KEY } : {}),
+        ...(config.INGRAVITY_AGENT_BUDGET ? { INGRAVITY_AGENT_BUDGET: config.INGRAVITY_AGENT_BUDGET } : {}),
+        ...(config.INGRAVITY_API_URL ? { INGRAVITY_API_URL: config.INGRAVITY_API_URL } : {}),
+        ...(config.INGRAVITY_RECEIPT_TOKEN ? { INGRAVITY_RECEIPT_TOKEN: config.INGRAVITY_RECEIPT_TOKEN } : {}),
+        ...(config.INGRAVITY_PAYMENT_SIGNATURE ? { INGRAVITY_PAYMENT_SIGNATURE: config.INGRAVITY_PAYMENT_SIGNATURE } : {})
+      }
+    })
 tags:
   - web3
   - security
@@ -26,3 +60,4 @@ tags:
   - defi
   - firewall
   - honeypot-scanner
+  - solidity-audit

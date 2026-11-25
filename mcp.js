@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Ingravity Security MCP Server (v1.3.4 — Model Context Protocol 2025-06-18 + x402 v2 MCP Transport)
+ * Ingravity Security MCP Server (v1.3.5 — Model Context Protocol 2025-06-18 + x402 v2 MCP Transport)
  * ----------------------------------------------------------------------------
  * Self-contained, zero-dependency Node.js STDIO MCP Server implementation.
  *
@@ -9,18 +9,27 @@
  *     resources/list, resources/read, prompts/list, prompts/get.
  *   - Pure-local deterministic EVM utilities: ERC-8021 calldata attribution
  *     encoding and structural 4-byte EVM calldata ABI selector decoding.
- *   - Local strict input validation (-32602), session receipt token caching
- *     (X-Ingravity-Receipt-Token), and REST API v1 tool execution against
- *     Ingravity x402 v2 Base USDC security endpoints (/api/v1/*).
+ *   - Zero-custody local EIP-3009 auto-signing when INGRAVITY_PRIVATE_KEY is
+ *     supplied in env/options (strictly capped by INGRAVITY_AGENT_BUDGET),
+ *     plus full @x402/mcp _meta['x402/error'] & _meta['x402/payment'] support.
  */
 
+const crypto = require("crypto");
 const https = require("https");
 const http = require("http");
 const readline = require("readline");
-const { encodeErc8021Calldata, ERC8021_BUILDER_CODE, ERC8021_SUFFIX_HEX } = require("./index.js");
+const {
+  encodeErc8021Calldata,
+  sanitizeX402V2Accept,
+  createEip3009PrivateKeySigner,
+  BASE_USDC_CONTRACT,
+  BASE_CHAIN_ID,
+  ERC8021_BUILDER_CODE,
+  ERC8021_SUFFIX_HEX
+} = require("./index.js");
 
 const SERVER_NAME = "ingravity-security";
-const SERVER_VERSION = "1.3.4";
+const SERVER_VERSION = "1.3.5";
 const DEFAULT_API_URL = (
   process.env.INGRAVITY_API_URL ||
   process.env.INGRAVITY_WORKER_URL ||
@@ -30,6 +39,16 @@ const MCP_ENDPOINT_URL = (process.env.INGRAVITY_MCP_URL || `${DEFAULT_API_URL}/m
 const SUPPORTED_CHAINS = [8453, 42161, 10, 137, 1];
 const EVM_ADDR_RE = /^0x[a-fA-F0-9]{40}$/;
 const HEX_DATA_RE = /^0x[a-fA-F0-9]*$/;
+
+const TOOL_ALIASES = {
+  ingravity_fast_ping: "ingravity_fastPingAddressSafety",
+  ingravity_tx_firewall: "ingravity_inspectEvmTransactionFirewall",
+  ingravity_token_rug_scanner: "ingravity_scanTokenRugpullAndHoneypot",
+  ingravity_defi_math_guard: "ingravity_computeDefiSlippageAndLiquidation",
+  ingravity_audit_solidity: "ingravity_auditSolidityContract",
+  ingravity_protocol_dossier: "ingravity_generateMultiContractProtocolDossier",
+  ingravity_deep_exploit_bounty: "ingravity_simulateDeepExploitAndWhitehatBounty"
+};
 
 const KNOWN_EVM_SELECTORS = {
   "0x095ea7b3": { signature: "approve(address,uint256)", standard: "ERC-20", params: ["spender", "amount"] },
@@ -73,8 +92,8 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_fastPingAddressSafety",
-    title: "Fast EVM Address Safety Ping",
-    description: "Queries the Ingravity x402 v2 API (/api/v1/fast-ping) for a binary SAFE/DANGER address gate across 5 EVM chains ($0.01 USDC flat on Base Mainnet). Strictly read-only.",
+    title: "Fast EVM Address Safety Ping ($0.01 USDC)",
+    description: "Queries the Ingravity x402 v2 API (/api/v1/fast-ping) for an instant binary SAFE/DANGER address & honeypot gate across 5 EVM chains ($0.01 USDC flat on Base Mainnet, zero API keys). Strictly read-only.",
     inputSchema: {
       type: "object",
       properties: {
@@ -87,7 +106,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_inspectEvmTransactionFirewall",
-    title: "Pre-Flight EVM Transaction Firewall",
+    title: "Pre-Flight EVM Transaction Firewall ($0.10 USDC)",
     description: "Submits transaction calldata to /api/v1/tx-firewall ($0.10 USDC on Base via x402 v2) for live 5-EVM RPC bytecode & EIP-1967/1167 proxy inspection, drainer interception, and unsigned EIP-5792 revocation bundles.",
     inputSchema: {
       type: "object",
@@ -106,7 +125,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_scanTokenRugpullAndHoneypot",
-    title: "ERC-20 Token Rugpull & Honeypot Scanner",
+    title: "ERC-20 Token Rugpull & Honeypot Scanner ($0.04-$0.12)",
     description: "Calls /api/v1/token-rug-scanner ($0.12 Full / $0.04 Essential USDC via x402 v2) to audit ERC-20 tokens via live 5-EVM RPC bytecode disassembly & proxy inspection (no Solidity source required).",
     inputSchema: {
       type: "object",
@@ -122,7 +141,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_computeDefiSlippageAndLiquidation",
-    title: "DeFi Slippage, MEV & Liquidation Math Guard",
+    title: "DeFi Slippage, MEV & Liquidation Math Guard ($0.04-$0.10)",
     description: "Calls /api/v1/defi-math-guard ($0.10 Full / $0.04 Essential USDC via x402 v2) for exact 18-decimal BigInt AMM swap math, 48-step MEV sandwich bounds, and perpetual liquidation thresholds.",
     inputSchema: {
       type: "object",
@@ -155,7 +174,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_auditSolidityContract",
-    title: "24-Vector Solidity Contract Auditor",
+    title: "24-Vector Solidity Contract Auditor ($0.35-$0.85)",
     description: "Calls /api/v1/audit-solidity ($0.85 Full / $0.35 Essential USDC via x402 v2) for a deterministic 24-vector Solidity static audit with 4-gate anti-noise filtering.",
     inputSchema: {
       type: "object",
@@ -173,7 +192,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_generateMultiContractProtocolDossier",
-    title: "Multi-Contract DeFi Protocol Auditor",
+    title: "Multi-Contract DeFi Protocol Auditor ($3.50-$12.00)",
     description: "Calls /api/v1/protocol-dossier ($12.00 Full / $3.50 Essential USDC via x402 v2) to audit 1-20 interdependent Solidity contracts for cross-contract reentrancy and ERC-4626/oracle invariants.",
     inputSchema: {
       type: "object",
@@ -204,7 +223,7 @@ const MCP_TOOLS = [
   },
   {
     name: "ingravity_simulateDeepExploitAndWhitehatBounty",
-    title: "Flash-Loan Exploit Simulator & Safe-Harbor Planner",
+    title: "Flash-Loan Exploit Simulator & Safe-Harbor Planner ($9.50-$45.00)",
     description: "Calls /api/v1/deep-exploit-bounty ($45.00 Full / $9.50 Essential USDC via x402 v2) for flash-loan exploit vector simulation, live TVL inspection, and unsigned EIP-5792 Safe-Harbor rescue plans.",
     inputSchema: {
       type: "object",
@@ -233,7 +252,7 @@ const MCP_RESOURCES = [
   {
     uri: "ingravity://docs/x402-settlement",
     name: "x402 v2 Settlement Guide",
-    description: "How to supply gasless EIP-3009 PAYMENT-SIGNATURE, X-Agent-Budget, and X-Ingravity-Receipt-Token headers.",
+    description: "How to supply INGRAVITY_PRIVATE_KEY (local auto-pay), PAYMENT-SIGNATURE, X-Agent-Budget, and X-Ingravity-Receipt-Token.",
     mimeType: "application/json"
   }
 ];
@@ -419,6 +438,11 @@ function httpJsonRequest(method, targetUrl, bodyObj, extraHeaders = {}, timeoutM
   });
 }
 
+function parseCaipChainId(networkStr) {
+  const m = String(networkStr || "").match(/^eip155:(\d+)$/i);
+  return m ? Number(m[1]) : BASE_CHAIN_ID;
+}
+
 async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, options = {}) {
   const baseUrl = (options.apiUrl || DEFAULT_API_URL).replace(/\/$/, "");
   const headers = {};
@@ -460,6 +484,10 @@ async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, option
   }
 
   if (res.status === 402) {
+    if (receiptToken && cacheKey) {
+      sessionReceiptCache.delete(cacheKey);
+      delete headers["X-Ingravity-Receipt-Token"];
+    }
     const decodedChallenge = decodeBase64JsonHeader(res.headers["payment-required"] || res.headers["x-payment-required"]);
     const canonical402 =
       decodedChallenge && typeof decodedChallenge === "object" && Array.isArray(decodedChallenge.accepts)
@@ -467,7 +495,70 @@ async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, option
         : (payload && payload.x402Version && Array.isArray(payload.accepts)
           ? payload
           : { x402Version: 2, httpStatus: 402, paymentRequired: true, ...payload });
-    return makeToolResult(canonical402, true);
+
+    // Local zero-custody EIP-3009 auto-signing when INGRAVITY_PRIVATE_KEY is explicitly configured
+    const autoPrivKey = options.privateKey || process.env.INGRAVITY_PRIVATE_KEY || process.env.X402_PRIVATE_KEY;
+    if (autoPrivKey && !paymentSig && Array.isArray(canonical402.accepts) && canonical402.accepts.length > 0) {
+      try {
+        const signer = createEip3009PrivateKeySigner(autoPrivKey);
+        const maxBudgetUsdc = budget != null && String(budget).trim() !== "" ? Number(budget) : 0.12;
+        const maxAtoms = BigInt(Math.floor(maxBudgetUsdc * 1e6 + 1e-6));
+        const cleanAccepts = canonical402.accepts.map(sanitizeX402V2Accept);
+        const requestedTier = bodyObj && bodyObj.tier ? String(bodyObj.tier).trim().toUpperCase() : null;
+        const affordable = cleanAccepts.filter((a) => a && a.amount && BigInt(a.amount) <= maxAtoms);
+        const chosen =
+          (requestedTier
+            ? affordable.find((a) => String((a.extra && a.extra.tier) || "FULL").toUpperCase() === requestedTier)
+            : null) ||
+          affordable.find((a) => String(a.network || "").toLowerCase() === "eip155:8453") ||
+          affordable[0] ||
+          null;
+
+        if (chosen && chosen.payTo) {
+          const now = Math.floor(Date.now() / 1000);
+          const authorization = {
+            from: signer.address,
+            to: chosen.payTo,
+            value: String(chosen.amount),
+            validAfter: String(now - 60),
+            validBefore: String(now + (chosen.maxTimeoutSeconds || 300)),
+            nonce: "0x" + crypto.randomBytes(32).toString("hex")
+          };
+          const signature = await signer.signTypedData({
+            domain: {
+              name: (chosen.extra && chosen.extra.name) || "USD Coin",
+              version: (chosen.extra && chosen.extra.version) || "2",
+              chainId: parseCaipChainId(chosen.network),
+              verifyingContract: chosen.asset || BASE_USDC_CONTRACT
+            },
+            message: authorization
+          });
+          const signedPayload = {
+            x402Version: 2,
+            accepted: chosen,
+            payload: { signature, authorization }
+          };
+          const retryHeaders = {
+            ...headers,
+            "PAYMENT-SIGNATURE": Buffer.from(JSON.stringify(signedPayload), "utf8").toString("base64")
+          };
+          const paidRes = await httpJsonRequest(method, `${baseUrl}${routePath}`, bodyObj, retryHeaders, options.timeoutMs || 15000);
+          if (paidRes.status >= 200 && paidRes.status < 300) {
+            const paidData = paidRes.json && typeof paidRes.json === "object" ? paidRes.json : { status: paidRes.status, body: paidRes.raw };
+            const newReceipt =
+              paidRes.headers["x-ingravity-receipt-token"] ||
+              (paidData && typeof paidData.receiptToken === "string" ? paidData.receiptToken : null);
+            if (newReceipt && cacheKey) {
+              sessionReceiptCache.set(cacheKey, String(newReceipt));
+            }
+            const payRespObj = decodeBase64JsonHeader(paidRes.headers["payment-response"] || paidRes.headers["x-payment-response"]);
+            return makeToolResult(paidData, false, payRespObj ? { "x402/payment-response": payRespObj } : null);
+          }
+        }
+      } catch (_) {}
+    }
+
+    return makeToolResult(canonical402, true, { "x402/error": canonical402 });
   }
 
   return makeToolResult(
@@ -479,7 +570,8 @@ async function callIngravityRestApi(method, routePath, bodyObj, cacheKey, option
   );
 }
 
-async function executeToolCall(toolName, rawArgs, options = {}) {
+async function executeToolCall(rawToolName, rawArgs, options = {}) {
+  const toolName = TOOL_ALIASES[rawToolName] || rawToolName;
   const args = rawArgs && typeof rawArgs === "object" ? rawArgs : {};
 
   if (toolName === "ingravity_encodeErc8021Calldata") {
@@ -629,7 +721,7 @@ async function executeToolCall(toolName, rawArgs, options = {}) {
     };
   }
 
-  return { rpcError: [-32602, `Unknown tool: ${toolName}`] };
+  return { rpcError: [-32602, `Unknown tool: ${rawToolName}`] };
 }
 
 async function handleMcpMessage(jsonLine, options = {}) {
@@ -670,7 +762,7 @@ async function handleMcpMessage(jsonLine, options = {}) {
         version: SERVER_VERSION
       },
       instructions:
-        "Ingravity Security MCP Server (5-EVM Web3 defense). Use local tools ingravity_decodeEvmCalldataSelector and ingravity_encodeErc8021Calldata for structural calldata parsing and ERC-8021 attribution, and the 7 x402-backed API tools for live on-chain honeypot, drainer firewall, MEV math, and Solidity audit verdicts."
+        "Ingravity Security MCP Server (5-EVM Web3 defense). Use local tools ingravity_decodeEvmCalldataSelector and ingravity_encodeErc8021Calldata for structural calldata parsing and ERC-8021 attribution, and the 7 x402-backed API tools ($0.01-$45.00 USDC on Base) for live honeypot, drainer firewall, MEV math, and Solidity audit verdicts. Set INGRAVITY_PRIVATE_KEY + INGRAVITY_AGENT_BUDGET for automatic local gasless EIP-3009 payments."
     });
   }
 
@@ -738,8 +830,9 @@ async function handleMcpMessage(jsonLine, options = {}) {
               asset: "Native Base USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)",
               zeroCustody: true,
               envVars: {
+                INGRAVITY_PRIVATE_KEY: "Optional local EVM private key (0x...) for automatic zero-custody EIP-3009 signing up to INGRAVITY_AGENT_BUDGET",
+                INGRAVITY_AGENT_BUDGET: "Optional max USDC spend per call (default: 0.12 when INGRAVITY_PRIVATE_KEY is set)",
                 INGRAVITY_API_URL: "Override Ingravity REST API base URL",
-                INGRAVITY_AGENT_BUDGET: "Optional max USDC spend per call",
                 INGRAVITY_PAYMENT_SIGNATURE: "Base64 EIP-3009 x402 PAYMENT-SIGNATURE header",
                 INGRAVITY_RECEIPT_TOKEN: "Optional reusable X-Ingravity-Receipt-Token"
               }
@@ -798,11 +891,12 @@ if (require.main === module) {
     output: process.stdout,
     terminal: false
   });
-
   rl.on("line", async (line) => {
-    const response = await handleMcpMessage(line);
-    if (response) {
-      process.stdout.write(response.replace(/\r?\n/g, "") + "\n");
+    try {
+      const resp = await handleMcpMessage(line);
+      if (resp) process.stdout.write(resp + "\n");
+    } catch (err) {
+      process.stdout.write(makeError(null, -32603, err.message) + "\n");
     }
   });
 }
@@ -810,10 +904,12 @@ if (require.main === module) {
 module.exports = {
   handleMcpMessage,
   forwardMcpLine: handleMcpMessage,
+  executeToolCall,
+  decodeCalldataLocally,
   MCP_TOOLS,
   MCP_RESOURCES,
   MCP_PROMPTS,
   MCP_ENDPOINT_URL,
-  DEFAULT_API_URL,
-  DEFAULT_WORKER_URL: DEFAULT_API_URL
+  SERVER_NAME,
+  SERVER_VERSION
 };

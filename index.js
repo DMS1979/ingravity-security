@@ -1,13 +1,14 @@
 /**
- * INGRAVITY SECURITY SDK (ingravity-security) v1.3.4
+ * INGRAVITY SECURITY SDK (ingravity-security) v1.3.5
  * -----------------------------------------------------------------------
  * Autonomous 5-EVM Web3 Security, $0.01 Fast-Ping, Pre-Flight Transaction Firewall,
  * Live EVM RPC Token Honeypot Scanner, ERC-8021 Attribution & Atomic EIP-5792
- * Safe-Harbor Rescue Provider for Coinbase AgentKit, ElizaOS, LangChain & MCP
- * on Base (8453), Arbitrum (42161), Optimism (10), Polygon (137), and Ethereum (1).
+ * Safe-Harbor Rescue Provider for Coinbase AgentKit, Viem, Ethers v5/v6, ElizaOS,
+ * LangChain & MCP on Base (8453), Arbitrum (42161), Optimism (10), Polygon (137), and Ethereum (1).
  *
  * Official x402 v2 Catalog (Swarm v3.14.0):
  *  - Zero Free Verdict Leaks: 100% deterministic paid x402 v2 endpoints
+ *  - Zero-Dependency EIP-3009 Signer + Universal Viem / Ethers / AgentKit Adapter
  *  - Settlement Network: Base Mainnet (eip155:8453)
  *  - Payee (Trust Wallet): 0xAA99e12320a3db0116ef56D2e19F70f6796Bad0f
  *  - Settlement Asset: Native USDC (0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913)
@@ -22,7 +23,360 @@ const BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const BASE_CHAIN_ID = 8453;
 const ERC8021_BUILDER_CODE = "bc_i26d7owr";
 const ERC8021_SUFFIX_HEX = "0b62635f69323664376f77720080218021802180218021802180218021";
-const SDK_VERSION = "1.3.4";
+const SDK_VERSION = "1.3.5";
+
+// ============================================================================
+// 0. ZERO-DEPENDENCY ETHEREUM KECCAK-256 + SECP256K1 + EIP-3009 SIGNER
+// ============================================================================
+const MASK64 = 0xffffffffffffffffn;
+const KECCAK_RC = new Array(24);
+const KECCAK_ROTC = new Array(24);
+const KECCAK_PI = new Array(24);
+
+(function initKeccakTables() {
+  let r = 1;
+  for (let round = 0; round < 24; round++) {
+    let rc = 0n;
+    for (let j = 0; j < 7; j++) {
+      if (r & 1) rc |= 1n << BigInt((1 << j) - 1);
+      r = ((r << 1) ^ ((r >> 7) * 0x71)) & 0xff;
+    }
+    KECCAK_RC[round] = rc;
+  }
+  let x = 1;
+  let y = 0;
+  for (let t = 0; t < 24; t++) {
+    const ny = (2 * x + 3 * y) % 5;
+    x = y;
+    y = ny;
+    KECCAK_PI[t] = x + 5 * y;
+    KECCAK_ROTC[t] = (((t + 1) * (t + 2)) / 2) % 64;
+  }
+})();
+
+function rotl64(v, n) {
+  if (n === 0) return v;
+  const s = BigInt(n);
+  return ((v << s) | (v >> (64n - s))) & MASK64;
+}
+
+function keccak256Buffer(input) {
+  const src = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  const rate = 136;
+  const rem = src.length % rate;
+  const padLen = rate - rem;
+  const msg = Buffer.alloc(src.length + padLen);
+  src.copy(msg, 0);
+  msg[src.length] = 0x01; // Original Ethereum Keccak-256 padding (NOT SHA3 0x06)
+  msg[msg.length - 1] |= 0x80;
+
+  const state = new BigUint64Array(25);
+  const bc = new BigUint64Array(5);
+
+  for (let offset = 0; offset < msg.length; offset += rate) {
+    for (let i = 0; i < 17; i++) {
+      state[i] ^= msg.readBigUInt64LE(offset + i * 8);
+    }
+    for (let round = 0; round < 24; round++) {
+      for (let i = 0; i < 5; i++) {
+        bc[i] = state[i] ^ state[i + 5] ^ state[i + 10] ^ state[i + 15] ^ state[i + 20];
+      }
+      for (let i = 0; i < 5; i++) {
+        const t = bc[(i + 4) % 5] ^ rotl64(bc[(i + 1) % 5], 1);
+        for (let j = 0; j < 25; j += 5) state[j + i] ^= t;
+      }
+      let cur = state[1];
+      for (let t = 0; t < 24; t++) {
+        const idx = KECCAK_PI[t];
+        const tmp = state[idx];
+        state[idx] = rotl64(cur, KECCAK_ROTC[t]);
+        cur = tmp;
+      }
+      for (let j = 0; j < 25; j += 5) {
+        const s0 = state[j], s1 = state[j + 1], s2 = state[j + 2], s3 = state[j + 3], s4 = state[j + 4];
+        state[j] = s0 ^ ((~s1 & MASK64) & s2);
+        state[j + 1] = s1 ^ ((~s2 & MASK64) & s3);
+        state[j + 2] = s2 ^ ((~s3 & MASK64) & s4);
+        state[j + 3] = s3 ^ ((~s4 & MASK64) & s0);
+        state[j + 4] = s4 ^ ((~s0 & MASK64) & s1);
+      }
+      state[0] ^= KECCAK_RC[round];
+    }
+  }
+
+  const out = Buffer.alloc(32);
+  for (let i = 0; i < 4; i++) {
+    out.writeBigUInt64LE(state[i], i * 8);
+  }
+  return out;
+}
+
+function keccak256Hex(input) {
+  return "0x" + keccak256Buffer(input).toString("hex");
+}
+
+const SECP_P = 0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffefffffc2fn;
+const SECP_N = 0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141n;
+const SECP_HALF_N = SECP_N >> 1n;
+const SECP_GX = 0x79be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798n;
+const SECP_GY = 0x483ada7726a3c4655da4fbfc0e1108a8fd17b448a68554199c47d08ffb10d4b8n;
+
+function modPos(a, m) {
+  const r = a % m;
+  return r < 0n ? r + m : r;
+}
+
+function modInv(a, m) {
+  let t = 0n, newT = 1n;
+  let r = m, newR = modPos(a, m);
+  while (newR !== 0n) {
+    const q = r / newR;
+    const tmpT = t - q * newT; t = newT; newT = tmpT;
+    const tmpR = r - q * newR; r = newR; newR = tmpR;
+  }
+  if (r !== 1n) throw new Error("Non-invertible scalar");
+  return t < 0n ? t + m : t;
+}
+
+function jacDouble(p) {
+  const [X1, Y1, Z1] = p;
+  if (Z1 === 0n || Y1 === 0n) return [0n, 1n, 0n];
+  const Y1Sq = modPos(Y1 * Y1, SECP_P);
+  const S = modPos(4n * X1 * Y1Sq, SECP_P);
+  const M = modPos(3n * X1 * X1, SECP_P);
+  const X3 = modPos(M * M - 2n * S, SECP_P);
+  const Y3 = modPos(M * (S - X3) - 8n * Y1Sq * Y1Sq, SECP_P);
+  const Z3 = modPos(2n * Y1 * Z1, SECP_P);
+  return [X3, Y3, Z3];
+}
+
+function jacAdd(p, q) {
+  const [X1, Y1, Z1] = p;
+  const [X2, Y2, Z2] = q;
+  if (Z1 === 0n) return q;
+  if (Z2 === 0n) return p;
+  const Z1Sq = modPos(Z1 * Z1, SECP_P);
+  const Z2Sq = modPos(Z2 * Z2, SECP_P);
+  const U1 = modPos(X1 * Z2Sq, SECP_P);
+  const U2 = modPos(X2 * Z1Sq, SECP_P);
+  const S1 = modPos(Y1 * modPos(Z2Sq * Z2, SECP_P), SECP_P);
+  const S2 = modPos(Y2 * modPos(Z1Sq * Z1, SECP_P), SECP_P);
+  if (U1 === U2) {
+    return S1 === S2 ? jacDouble(p) : [0n, 1n, 0n];
+  }
+  const H = modPos(U2 - U1, SECP_P);
+  const R = modPos(S2 - S1, SECP_P);
+  const HSq = modPos(H * H, SECP_P);
+  const HCube = modPos(H * HSq, SECP_P);
+  const U1HSq = modPos(U1 * HSq, SECP_P);
+  const X3 = modPos(R * R - HCube - 2n * U1HSq, SECP_P);
+  const Y3 = modPos(R * (U1HSq - X3) - S1 * HCube, SECP_P);
+  const Z3 = modPos(H * Z1 * Z2, SECP_P);
+  return [X3, Y3, Z3];
+}
+
+function secpScalarMulBase(k) {
+  let scalar = modPos(k, SECP_N);
+  if (scalar === 0n) throw new Error("Invalid zero scalar");
+  let res = [0n, 1n, 0n];
+  let addend = [SECP_GX, SECP_GY, 1n];
+  while (scalar > 0n) {
+    if (scalar & 1n) res = jacAdd(res, addend);
+    addend = jacDouble(addend);
+    scalar >>= 1n;
+  }
+  const invZ = modInv(res[2], SECP_P);
+  const invZ2 = modPos(invZ * invZ, SECP_P);
+  const invZ3 = modPos(invZ2 * invZ, SECP_P);
+  return [modPos(res[0] * invZ2, SECP_P), modPos(res[1] * invZ3, SECP_P)];
+}
+
+function toChecksumAddress(rawHexLower40) {
+  const clean = rawHexLower40.replace(/^0x/i, "").toLowerCase();
+  const hashHex = keccak256Buffer(Buffer.from(clean, "utf8")).toString("hex");
+  let out = "0x";
+  for (let i = 0; i < 40; i++) {
+    out += parseInt(hashHex[i], 16) >= 8 ? clean[i].toUpperCase() : clean[i];
+  }
+  return out;
+}
+
+function deriveAddressFromPrivateKey(privateKeyHex) {
+  const clean = String(privateKeyHex || "").trim().replace(/^0x/i, "");
+  if (!/^[0-9a-fA-F]{64}$/.test(clean)) {
+    throw new Error("Invalid EVM private key: expected 32-byte (64 hex chars) key");
+  }
+  const privInt = BigInt("0x" + clean);
+  if (privInt <= 0n || privInt >= SECP_N) {
+    throw new Error("Private key scalar out of secp256k1 curve range");
+  }
+  const [px, py] = secpScalarMulBase(privInt);
+  const pubBuf = Buffer.concat([
+    Buffer.from(px.toString(16).padStart(64, "0"), "hex"),
+    Buffer.from(py.toString(16).padStart(64, "0"), "hex")
+  ]);
+  const addrLower = keccak256Buffer(pubBuf).subarray(12).toString("hex");
+  return toChecksumAddress(addrLower);
+}
+
+function rfc6979SignDigest(digestBuf, privHexClean) {
+  const privBuf = Buffer.from(privHexClean, "hex");
+  const d = BigInt("0x" + privHexClean);
+  const z = BigInt("0x" + digestBuf.toString("hex"));
+
+  // RFC 6979 HMAC-DRBG (SHA-256)
+  let v = Buffer.alloc(32, 0x01);
+  let kHmac = Buffer.alloc(32, 0x00);
+  kHmac = crypto.createHmac("sha256", kHmac).update(Buffer.concat([v, Buffer.from([0x00]), privBuf, digestBuf])).digest();
+  v = crypto.createHmac("sha256", kHmac).update(v).digest();
+  kHmac = crypto.createHmac("sha256", kHmac).update(Buffer.concat([v, Buffer.from([0x01]), privBuf, digestBuf])).digest();
+  v = crypto.createHmac("sha256", kHmac).update(v).digest();
+
+  while (true) {
+    v = crypto.createHmac("sha256", kHmac).update(v).digest();
+    const k = BigInt("0x" + v.toString("hex"));
+    if (k >= 1n && k < SECP_N) {
+      const [rx, ry] = secpScalarMulBase(k);
+      const r = rx % SECP_N;
+      if (r !== 0n) {
+        let recId = Number(ry & 1n) | (rx >= SECP_N ? 2 : 0);
+        let s = modPos(modInv(k, SECP_N) * modPos(z + r * d, SECP_N), SECP_N);
+        if (s !== 0n) {
+          if (s > SECP_HALF_N) {
+            s = SECP_N - s;
+            recId ^= 1;
+          }
+          const rHex = r.toString(16).padStart(64, "0");
+          const sHex = s.toString(16).padStart(64, "0");
+          const vHex = (27 + recId).toString(16).padStart(2, "0");
+          return "0x" + rHex + sHex + vHex;
+        }
+      }
+    }
+    kHmac = crypto.createHmac("sha256", kHmac).update(Buffer.concat([v, Buffer.from([0x00])])).digest();
+    v = crypto.createHmac("sha256", kHmac).update(v).digest();
+  }
+}
+
+function abiWordUint(val) {
+  const bi = BigInt(val);
+  if (bi < 0n) throw new Error("Negative uint256 in EIP-712 encoding");
+  return Buffer.from(bi.toString(16).padStart(64, "0"), "hex");
+}
+
+function abiWordAddress(addr) {
+  const clean = String(addr || "").trim().replace(/^0x/i, "").toLowerCase();
+  if (!/^[0-9a-f]{40}$/.test(clean)) throw new Error(`Invalid EIP-712 address: ${addr}`);
+  return Buffer.from(clean.padStart(64, "0"), "hex");
+}
+
+function abiWordBytes32(b32) {
+  const clean = String(b32 || "").trim().replace(/^0x/i, "").toLowerCase();
+  if (!/^[0-9a-f]{64}$/.test(clean)) throw new Error(`Invalid EIP-712 bytes32: ${b32}`);
+  return Buffer.from(clean, "hex");
+}
+
+const EIP712_DOMAIN_TYPEHASH = keccak256Buffer(
+  Buffer.from("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)", "utf8")
+);
+const EIP3009_TRANSFER_AUTH_TYPEHASH = keccak256Buffer(
+  Buffer.from("TransferWithAuthorization(address from,address to,uint256 value,uint256 validAfter,uint256 validBefore,bytes32 nonce)", "utf8")
+);
+
+function hashEip3009TransferWithAuthorization(domain, message) {
+  const domainSep = keccak256Buffer(
+    Buffer.concat([
+      EIP712_DOMAIN_TYPEHASH,
+      keccak256Buffer(Buffer.from(String(domain.name || "USD Coin"), "utf8")),
+      keccak256Buffer(Buffer.from(String(domain.version || "2"), "utf8")),
+      abiWordUint(domain.chainId != null ? domain.chainId : BASE_CHAIN_ID),
+      abiWordAddress(domain.verifyingContract || BASE_USDC_CONTRACT)
+    ])
+  );
+  const structHash = keccak256Buffer(
+    Buffer.concat([
+      EIP3009_TRANSFER_AUTH_TYPEHASH,
+      abiWordAddress(message.from),
+      abiWordAddress(message.to),
+      abiWordUint(message.value),
+      abiWordUint(message.validAfter),
+      abiWordUint(message.validBefore),
+      abiWordBytes32(message.nonce)
+    ])
+  );
+  return keccak256Buffer(Buffer.concat([Buffer.from([0x19, 0x01]), domainSep, structHash]));
+}
+
+function createEip3009PrivateKeySigner(privateKeyHex) {
+  const clean = String(privateKeyHex || "").trim().replace(/^0x/i, "");
+  const address = deriveAddressFromPrivateKey(clean);
+  return {
+    address,
+    getAddress: async () => address,
+    signTypedData: async (typedDataOrDomain, maybeTypes, maybeValue) => {
+      const domain = maybeValue ? typedDataOrDomain : typedDataOrDomain.domain;
+      const message = maybeValue ? maybeValue : typedDataOrDomain.message;
+      const digest = hashEip3009TransferWithAuthorization(domain, message);
+      return rfc6979SignDigest(digest, clean);
+    }
+  };
+}
+
+function parseChainIdFromCaip2(networkStr) {
+  const m = String(networkStr || "").match(/^eip155:(\d+)$/i);
+  return m ? Number(m[1]) : BASE_CHAIN_ID;
+}
+
+async function signWithUniversalWallet(wp, typedDataPayload) {
+  if (!wp) return null;
+  const { domain, types, primaryType, message } = typedDataPayload;
+
+  // 1. Viem WalletClient ({ account: { address }, signTypedData })
+  if (wp.account && typeof wp.account.address === "string" && typeof wp.signTypedData === "function") {
+    const signature = await wp.signTypedData({
+      account: wp.account,
+      domain,
+      types,
+      primaryType,
+      message
+    });
+    return { from: wp.account.address, signature };
+  }
+
+  // 2. Viem LocalAccount ({ address: "0x...", signTypedData })
+  if (typeof wp.address === "string" && /^0x[0-9a-fA-F]{40}$/.test(wp.address) && typeof wp.signTypedData === "function" && typeof wp.getAddress !== "function") {
+    const signature = await wp.signTypedData({ domain, types, primaryType, message });
+    return { from: wp.address, signature };
+  }
+
+  // 3. Ethers v5 Signer (_signTypedData(domain, types, value))
+  if (typeof wp._signTypedData === "function" && typeof wp.getAddress === "function") {
+    const from = await wp.getAddress();
+    const signature = await wp._signTypedData(domain, types, message);
+    return { from, signature };
+  }
+
+  // 4. Ethers v6 Signer vs Coinbase AgentKit EvmWalletProvider
+  if (typeof wp.signTypedData === "function" && typeof wp.getAddress === "function") {
+    const from = await wp.getAddress();
+    if (wp.signTypedData.length >= 3 || "_signingKey" in wp || ("provider" in wp && typeof wp.connect === "function")) {
+      const signature = await wp.signTypedData(domain, types, message);
+      return { from, signature };
+    }
+    try {
+      const signature = await wp.signTypedData({ domain, types, primaryType, message });
+      return { from, signature };
+    } catch (err) {
+      if (err instanceof TypeError || /undefined|null|types/i.test(String(err && err.message))) {
+        const signature = await wp.signTypedData(domain, types, message);
+        return { from, signature };
+      }
+      throw err;
+    }
+  }
+
+  return null;
+}
 
 function encodeErc8021Calldata(calldataHex = "0x") {
   const clean = String(calldataHex || "0x").trim();
@@ -44,7 +398,7 @@ function sanitizeX402V2Accept(accept) {
 }
 
 // ============================================================================
-// 1. COINBASE AGENTKIT, LANGCHAIN & STANDALONE M2M ACTION PROVIDER
+// 1. COINBASE AGENTKIT, VIEM, ETHERS, LANGCHAIN & STANDALONE M2M PROVIDER
 // ============================================================================
 class IngravitySecurityActionProvider {
   constructor(config = {}) {
@@ -52,7 +406,7 @@ class IngravitySecurityActionProvider {
     this.version = SDK_VERSION;
     this.workerUrl = (config.workerUrl || WORKER_ENDPOINT).replace(/\/$/, "");
     this.payToWallet = config.payToWallet || PAY_TO_WALLET;
-    this.walletProvider = config.walletProvider || null; // EvmWalletProvider (signTypedData + getAddress)
+    this.walletProvider = config.walletProvider || (config.privateKey ? createEip3009PrivateKeySigner(config.privateKey) : null);
     this.maxSpendUsdc = config.maxSpendUsdc != null ? Number(config.maxSpendUsdc) : null;
     this.capitalAtRiskUsd = config.capitalAtRiskUsd != null ? Number(config.capitalAtRiskUsd) : null;
     this.enableReceiptCache = config.enableReceiptCache !== false;
@@ -276,7 +630,7 @@ class IngravitySecurityActionProvider {
       if (!payReq) payReq = await res.json();
 
       const accepts = (Array.isArray(payReq.accepts) && payReq.accepts.length ? payReq.accepts : [payReq]).map(sanitizeX402V2Accept);
-      const budgetAtoms = this.maxSpendUsdc != null ? BigInt(Math.floor(this.maxSpendUsdc * 1e6)) : null;
+      const budgetAtoms = this.maxSpendUsdc != null ? BigInt(Math.floor(this.maxSpendUsdc * 1e6 + 1e-6)) : null;
       const requestedTier = body && body.tier ? String(body.tier).trim().toUpperCase() : null;
       const affordable = budgetAtoms == null
         ? accepts
@@ -302,54 +656,67 @@ class IngravitySecurityActionProvider {
       if (!accept) return { ...quote, reason: "All available service tiers exceed your configured maxSpendUsdc budget" };
 
       const wp = this.walletProvider;
-      if (wp && typeof wp.signTypedData === "function" && typeof wp.getAddress === "function") {
+      if (wp) {
         const cleanAccept = sanitizeX402V2Accept(accept);
-        const from = await wp.getAddress();
         const now = Math.floor(Date.now() / 1000);
-        const authorization = {
-          from,
-          to: cleanAccept.payTo,
-          value: String(cleanAccept.amount),
-          validAfter: String(now - 60),
-          validBefore: String(now + (cleanAccept.maxTimeoutSeconds || 300)),
-          nonce: "0x" + crypto.randomBytes(32).toString("hex")
-        };
-        const signature = await wp.signTypedData({
-          domain: {
-            name: (cleanAccept.extra && cleanAccept.extra.name) || "USD Coin",
-            version: (cleanAccept.extra && cleanAccept.extra.version) || "2",
-            chainId: BASE_CHAIN_ID,
-            verifyingContract: cleanAccept.asset || BASE_USDC_CONTRACT
-          },
-          types: {
-            TransferWithAuthorization: [
-              { name: "from", type: "address" },
-              { name: "to", type: "address" },
-              { name: "value", type: "uint256" },
-              { name: "validAfter", type: "uint256" },
-              { name: "validBefore", type: "uint256" },
-              { name: "nonce", type: "bytes32" }
-            ]
-          },
-          primaryType: "TransferWithAuthorization",
-          message: authorization
-        });
+        const settleChainId = parseChainIdFromCaip2(cleanAccept.network);
+        const tempFrom =
+          (wp.account && wp.account.address) ||
+          (typeof wp.address === "string" ? wp.address : null) ||
+          (typeof wp.getAddress === "function" ? await wp.getAddress() : null);
 
-        const paymentPayload = { x402Version: 2, accepted: cleanAccept, payload: { signature, authorization } };
-        const paidRes = await fetch(targetUrl, {
-          method: "POST",
-          headers: {
-            ...headers,
-            "PAYMENT-SIGNATURE": Buffer.from(JSON.stringify(paymentPayload)).toString("base64")
-          },
-          body: JSON.stringify(body)
-        });
-        if (paidRes.ok) {
-          const paidJson = await paidRes.json();
-          this._cacheReceiptFromResponse(cacheKey, paidRes, paidJson);
-          return paidJson;
+        if (tempFrom) {
+          const authorization = {
+            from: tempFrom,
+            to: cleanAccept.payTo,
+            value: String(cleanAccept.amount),
+            validAfter: String(now - 60),
+            validBefore: String(now + (cleanAccept.maxTimeoutSeconds || 300)),
+            nonce: "0x" + crypto.randomBytes(32).toString("hex")
+          };
+          const signed = await signWithUniversalWallet(wp, {
+            domain: {
+              name: (cleanAccept.extra && cleanAccept.extra.name) || "USD Coin",
+              version: (cleanAccept.extra && cleanAccept.extra.version) || "2",
+              chainId: settleChainId,
+              verifyingContract: cleanAccept.asset || BASE_USDC_CONTRACT
+            },
+            types: {
+              TransferWithAuthorization: [
+                { name: "from", type: "address" },
+                { name: "to", type: "address" },
+                { name: "value", type: "uint256" },
+                { name: "validAfter", type: "uint256" },
+                { name: "validBefore", type: "uint256" },
+                { name: "nonce", type: "bytes32" }
+              ]
+            },
+            primaryType: "TransferWithAuthorization",
+            message: authorization
+          });
+
+          if (signed && signed.signature) {
+            const paymentPayload = {
+              x402Version: 2,
+              accepted: cleanAccept,
+              payload: { signature: signed.signature, authorization: { ...authorization, from: signed.from || tempFrom } }
+            };
+            const paidRes = await fetch(targetUrl, {
+              method: "POST",
+              headers: {
+                ...headers,
+                "PAYMENT-SIGNATURE": Buffer.from(JSON.stringify(paymentPayload)).toString("base64")
+              },
+              body: JSON.stringify(body)
+            });
+            if (paidRes.ok) {
+              const paidJson = await paidRes.json();
+              this._cacheReceiptFromResponse(cacheKey, paidRes, paidJson);
+              return paidJson;
+            }
+            return { ...quote, status: "PAYMENT_REJECTED", httpStatus: paidRes.status, detail: await paidRes.text() };
+          }
         }
-        return { ...quote, status: "PAYMENT_REJECTED", httpStatus: paidRes.status, detail: await paidRes.text() };
       }
 
       return { ...quote, message: `Ingravity requires ${Number(accept.amount) / 1e6} USDC on Base via x402.` };
@@ -447,6 +814,7 @@ const fastPingAction = {
       if (!address) return false;
       const provider = new IngravitySecurityActionProvider({
         walletProvider: runtime?.walletProvider || null,
+        privateKey: runtime?.getSetting ? runtime.getSetting("INGRAVITY_PRIVATE_KEY") : null,
         maxSpendUsdc: runtime?.maxSpendPerAction || 0.05
       });
       const res = await provider.fastPing({ address, chainId: (options && options.chainId) || 8453 });
@@ -472,6 +840,7 @@ const scanTokenAction = {
 
       const provider = new IngravitySecurityActionProvider({
         walletProvider: runtime?.walletProvider || null,
+        privateKey: runtime?.getSetting ? runtime.getSetting("INGRAVITY_PRIVATE_KEY") : null,
         maxSpendUsdc: runtime?.maxSpendPerAction || 0.12
       });
       const res = await provider.tokenRugScanner({ tokenAddress, chainId: 8453 });
@@ -499,6 +868,7 @@ const txFirewallAction = {
       const { to, data, from, value, ticketId, capitalAtRiskUsd } = options || {};
       const provider = new IngravitySecurityActionProvider({
         walletProvider: runtime?.walletProvider || null,
+        privateKey: runtime?.getSetting ? runtime.getSetting("INGRAVITY_PRIVATE_KEY") : null,
         maxSpendUsdc: runtime?.maxSpendPerAction || null
       });
       const res = await provider.txFirewall({ to, data, from, value, ticketId, capitalAtRiskUsd });
@@ -528,9 +898,14 @@ module.exports = {
   txFirewallAction,
   encodeErc8021Calldata,
   sanitizeX402V2Accept,
+  createEip3009PrivateKeySigner,
+  deriveAddressFromPrivateKey,
+  keccak256Hex,
   WORKER_ENDPOINT,
+  INGRAVITY_WORKER: WORKER_ENDPOINT,
   PAY_TO_WALLET,
   BASE_USDC_CONTRACT,
+  BASE_USDC: BASE_USDC_CONTRACT,
   BASE_CHAIN_ID,
   ERC8021_BUILDER_CODE,
   ERC8021_SUFFIX_HEX,
