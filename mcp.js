@@ -19,6 +19,7 @@ const https = require("https");
 const http = require("http");
 const readline = require("readline");
 const {
+  IngravitySecurityActionProvider,
   encodeErc8021Calldata,
   sanitizeX402V2Accept,
   createEip3009PrivateKeySigner,
@@ -29,7 +30,7 @@ const {
 } = require("./index.js");
 
 const SERVER_NAME = "ingravity-security";
-const SERVER_VERSION = "1.3.5";
+const SERVER_VERSION = "1.3.6";
 const DEFAULT_API_URL = (
   process.env.INGRAVITY_API_URL ||
   process.env.INGRAVITY_WORKER_URL ||
@@ -885,25 +886,110 @@ async function handleMcpMessage(jsonLine, options = {}) {
   return makeError(id, -32601, `Method not found: ${method}`);
 }
 
-if (require.main === module) {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-    terminal: false
+async function runCliCommand(argv, opts = {}) {
+  const fs = require("fs");
+  const sub = String(argv[0] || "").trim().toLowerCase();
+  const privKey = opts.privateKey || process.env.INGRAVITY_PRIVATE_KEY || process.env.EVM_PRIVATE_KEY || process.env.PRIVATE_KEY || null;
+  const passTok = opts.passToken || process.env.INGRAVITY_PASS_TOKEN || null;
+  const maxSpend = opts.maxSpendUsdc != null
+    ? Number(opts.maxSpendUsdc)
+    : (process.env.INGRAVITY_AGENT_BUDGET != null ? Number(process.env.INGRAVITY_AGENT_BUDGET) : null);
+
+  if (sub === "--version" || sub === "-v" || sub === "version") {
+    return { version: SERVER_VERSION, name: SERVER_NAME };
+  }
+  if (sub === "--help" || sub === "-h" || sub === "help") {
+    return {
+      name: SERVER_NAME,
+      version: SERVER_VERSION,
+      usage: [
+        "npx ingravity-security ping <0xAddress> [chainId=8453]          # $0.01 USDC binary SAFE/DANGER gate",
+        "npx ingravity-security scan <0xTokenAddress> [chainId=8453]     # $0.04 Signal / $0.12 Full ERC-20 honeypot scan",
+        "npx ingravity-security firewall <0xTo> [0xData=0x] [chainId]    # $0.10 USDC pre-sign calldata firewall",
+        "npx ingravity-security audit <path/to/Contract.sol>             # $0.85 USDC 24-vector Solidity audit",
+        "npx ingravity-security pass [usdAmount=1]                       # $1/$5/$25 Prepaid M2M Pass (+15% bonus, <15ms)",
+        "npx ingravity-mcp                                               # Start MCP 2025-06-18 STDIO Server"
+      ],
+      autoPayEnv: "Set INGRAVITY_PRIVATE_KEY=0x... (or EVM_PRIVATE_KEY) with Base Mainnet USDC for 0-gas EIP-3009 auto-settlement."
+    };
+  }
+
+  const guard = new IngravitySecurityActionProvider({
+    workerUrl: opts.apiUrl || DEFAULT_API_URL,
+    privateKey: privKey,
+    passToken: passTok,
+    maxSpendUsdc: maxSpend
   });
-  rl.on("line", async (line) => {
-    try {
-      const resp = await handleMcpMessage(line);
-      if (resp) process.stdout.write(resp + "\n");
-    } catch (err) {
-      process.stdout.write(makeError(null, -32603, err.message) + "\n");
+
+  if (sub === "ping" || sub === "fast-ping") {
+    const address = argv[1] || BASE_USDC_CONTRACT;
+    const chainId = argv[2] ? Number(argv[2]) : 8453;
+    return await guard.fastPing({ address, chainId });
+  }
+  if (sub === "scan" || sub === "rug") {
+    const tokenAddress = argv[1] || BASE_USDC_CONTRACT;
+    const chainId = argv[2] ? Number(argv[2]) : 8453;
+    const tier = argv[3] ? String(argv[3]).toUpperCase() : undefined;
+    return await guard.tokenRugScanner({ tokenAddress, chainId, ...(tier ? { tier } : {}) });
+  }
+  if (sub === "firewall" || sub === "tx") {
+    const to = argv[1] || BASE_USDC_CONTRACT;
+    const data = argv[2] || "0x";
+    const chainId = argv[3] ? Number(argv[3]) : 8453;
+    return await guard.txFirewall({ to, data, chainId });
+  }
+  if (sub === "audit") {
+    const fileArg = argv[1];
+    if (!fileArg || !fs.existsSync(fileArg)) {
+      throw new Error("Provide a valid Solidity file path: npx ingravity-security audit ./Contract.sol");
     }
-  });
+    const code = fs.readFileSync(fileArg, "utf8");
+    return await guard.auditSolidity({ code, contractName: fileArg });
+  }
+  if (sub === "pass" || sub === "topup") {
+    const usdAmount = argv[1] ? Number(argv[1]) : 1;
+    return await guard.topupPass({ usdAmount });
+  }
+  return null;
+}
+
+if (require.main === module) {
+  const cliArgs = process.argv.slice(2);
+  const cliSub = cliArgs[0] ? String(cliArgs[0]).trim().toLowerCase() : "";
+  const isCliInvoke = Boolean(cliSub && cliSub !== "mcp" && cliSub !== "stdio" && cliSub !== "--stdio");
+  if (isCliInvoke) {
+    runCliCommand(cliArgs)
+      .then((out) => {
+        if (out !== null) {
+          process.stdout.write(JSON.stringify(out, null, 2) + "\n");
+          process.exit(0);
+        }
+      })
+      .catch((err) => {
+        process.stderr.write(JSON.stringify({ error: err.message }) + "\n");
+        process.exit(1);
+      });
+  } else {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+      terminal: false
+    });
+    rl.on("line", async (line) => {
+      try {
+        const resp = await handleMcpMessage(line);
+        if (resp) process.stdout.write(resp + "\n");
+      } catch (err) {
+        process.stdout.write(makeError(null, -32603, err.message) + "\n");
+      }
+    });
+  }
 }
 
 module.exports = {
   handleMcpMessage,
   forwardMcpLine: handleMcpMessage,
+  runCliCommand,
   executeToolCall,
   decodeCalldataLocally,
   MCP_TOOLS,

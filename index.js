@@ -1,12 +1,12 @@
 /**
- * INGRAVITY SECURITY SDK (ingravity-security) v1.3.5
+ * INGRAVITY SECURITY SDK (ingravity-security) v1.3.6
  * -----------------------------------------------------------------------
  * Autonomous 5-EVM Web3 Security, $0.01 Fast-Ping, Pre-Flight Transaction Firewall,
- * Live EVM RPC Token Honeypot Scanner, ERC-8021 Attribution & Atomic EIP-5792
+ * Live EVM RPC Token Honeypot Scanner, <15ms Prepaid M2M Pass, ERC-8021 Attribution &
  * Safe-Harbor Rescue Provider for Coinbase AgentKit, Viem, Ethers v5/v6, ElizaOS,
  * LangChain & MCP on Base (8453), Arbitrum (42161), Optimism (10), Polygon (137), and Ethereum (1).
  *
- * Official x402 v2 Catalog (Swarm v3.14.0):
+ * Official x402 v2 Catalog (Swarm v3.15.1):
  *  - Zero Free Verdict Leaks: 100% deterministic paid x402 v2 endpoints
  *  - Zero-Dependency EIP-3009 Signer + Universal Viem / Ethers / AgentKit Adapter
  *  - Settlement Network: Base Mainnet (eip155:8453)
@@ -23,7 +23,7 @@ const BASE_USDC_CONTRACT = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
 const BASE_CHAIN_ID = 8453;
 const ERC8021_BUILDER_CODE = "bc_i26d7owr";
 const ERC8021_SUFFIX_HEX = "0b62635f69323664376f77720080218021802180218021802180218021";
-const SDK_VERSION = "1.3.5";
+const SDK_VERSION = "1.3.6";
 
 // ============================================================================
 // 0. ZERO-DEPENDENCY ETHEREUM KECCAK-256 + SECP256K1 + EIP-3009 SIGNER
@@ -407,6 +407,7 @@ class IngravitySecurityActionProvider {
     this.workerUrl = (config.workerUrl || WORKER_ENDPOINT).replace(/\/$/, "");
     this.payToWallet = config.payToWallet || PAY_TO_WALLET;
     this.walletProvider = config.walletProvider || (config.privateKey ? createEip3009PrivateKeySigner(config.privateKey) : null);
+    this.passToken = config.passToken || null;
     this.maxSpendUsdc = config.maxSpendUsdc != null ? Number(config.maxSpendUsdc) : null;
     this.capitalAtRiskUsd = config.capitalAtRiskUsd != null ? Number(config.capitalAtRiskUsd) : null;
     this.enableReceiptCache = config.enableReceiptCache !== false;
@@ -587,6 +588,10 @@ class IngravitySecurityActionProvider {
     const headers = { "Content-Type": "application/json", ...extraHeaders };
     const cacheKey = this._computeCacheKey(path, body);
 
+    if (this.passToken && !headers["X-Ingravity-Pass"]) {
+      headers["X-Ingravity-Pass"] = String(this.passToken);
+    }
+
     if (this.maxSpendUsdc != null) {
       headers["X-Agent-Budget"] = String(this.maxSpendUsdc);
     }
@@ -723,6 +728,21 @@ class IngravitySecurityActionProvider {
     }
 
     throw new Error(`Ingravity gateway error (${res.status}): ${await res.text()}`);
+  }
+
+  async topupPass(params = { usdAmount: 1 }) {
+    const r = await this._callEndpoint("/api/v1/pass/topup", params);
+    if (r && r.passToken) this.passToken = r.passToken;
+    return r;
+  }
+
+  async checkPassBalance(params = {}) {
+    const tok = params.passToken || this.passToken || "";
+    const res = await fetch(`${this.workerUrl}/api/v1/pass/balance`, {
+      method: "GET",
+      headers: { "Accept": "application/json", ...(tok ? { "X-Ingravity-Pass": String(tok) } : {}) }
+    });
+    return await res.json();
   }
 
   async fastPing(params = {}) {

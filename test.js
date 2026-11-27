@@ -17,11 +17,11 @@ const {
   ERC8021_SUFFIX_HEX,
   SDK_VERSION
 } = require("./index.js");
-const { forwardMcpLine, MCP_ENDPOINT_URL } = require("./mcp.js");
+const { forwardMcpLine, runCliCommand, MCP_ENDPOINT_URL } = require("./mcp.js");
 
 console.log(`[TEST] Testing Ingravity Security SDK v${SDK_VERSION} exports...`);
 
-assert.strictEqual(SDK_VERSION, "1.3.5", "SDK_VERSION must be 1.3.5");
+assert.strictEqual(SDK_VERSION, "1.3.6", "SDK_VERSION must be 1.3.6");
 assert.ok(IngravitySecurityActionProvider, "IngravitySecurityActionProvider must be exported");
 assert.ok(ingravityElizaPlugin, "ingravityElizaPlugin must be exported");
 assert.strictEqual(ERC8021_BUILDER_CODE, "bc_i26d7owr");
@@ -45,7 +45,9 @@ const ethersRefWallet = new ethers.Wallet(TEST_PRIV_KEY);
 assert.strictEqual(deriveAddressFromPrivateKey(TEST_PRIV_KEY), ethersRefWallet.address, "secp256k1 address derivation mismatch vs ethers.Wallet");
 
 const provider = new IngravitySecurityActionProvider();
-assert.strictEqual(provider.version, "1.3.5");
+assert.strictEqual(provider.version, "1.3.6");
+assert.strictEqual(typeof provider.topupPass, "function");
+assert.strictEqual(typeof runCliCommand, "function");
 assert.strictEqual(provider.enableReceiptCache, true);
 assert.strictEqual(typeof provider.clearReceiptCache, "function");
 
@@ -98,18 +100,20 @@ const mcpIdx = workerSrc.indexOf('url.pathname === "/mcp"', fetchStart);
 assert.ok(fetchStart > 0 && claimIdx > fetchStart && rootClaimIdx > fetchStart, "Both Glama verification paths must be routed in handleFetchRequest");
 assert.ok(claimIdx < internalSyncIdx && claimIdx < mcpIdx, "Glama ownership claim must execute BEFORE auth-gated internal routes, /mcp, and x402 paywalls");
 
-// Official MCP Registry 1.3.5 coherence & duplicate-key guard
+// Official MCP Registry 1.3.6 (icons + websiteUrl) & npm 1.3.5 coherence + duplicate-key guard
 const serverJsonRaw = fs.readFileSync(path.join(__dirname, "server.json"), "utf8");
 assert.strictEqual((serverJsonRaw.match(/"version"\s*:/g) || []).length, 2, "server.json must have exactly 2 'version' keys (root + packages[0]), zero duplicates");
 const pkgDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "package.json"), "utf8"));
 const sdkServerDoc = JSON.parse(serverJsonRaw);
 const rootServerDoc = JSON.parse(fs.readFileSync(path.join(__dirname, "..", "mcp_registry_server.json"), "utf8"));
 const readmeDoc = fs.readFileSync(path.join(__dirname, "README.md"), "utf8");
-assert.strictEqual(pkgDoc.version, "1.3.5", "package.json version must be 1.3.5");
+assert.strictEqual(pkgDoc.version, "1.3.6", "package.json version must be 1.3.6");
 assert.strictEqual(pkgDoc.mcpName, "io.github.DMS1979/ingravity-security", "package.json must declare mcpName");
-assert.ok(pkgDoc.files.includes("server.json") && pkgDoc.files.includes("examples/"), "package.json files must ship server.json and examples/");
-assert.strictEqual(sdkServerDoc.version, "1.3.5", "sdk server.json version must be 1.3.5");
-assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.5", "sdk server.json npm package version must be 1.3.5");
+assert.ok(pkgDoc.files.includes("server.json") && pkgDoc.files.includes("SKILL.md") && pkgDoc.files.includes("examples/"), "package.json files must ship server.json, SKILL.md, and examples/");
+assert.strictEqual(sdkServerDoc.version, "1.3.7", "sdk server.json version must be 1.3.7");
+assert.strictEqual(sdkServerDoc.packages[0].version, "1.3.6", "sdk server.json npm package version must be 1.3.6");
+assert.strictEqual(sdkServerDoc.websiteUrl, "https://red-shape-1b3b.daviddelmoral79.workers.dev", "server.json must declare HTTPS websiteUrl");
+assert.ok(Array.isArray(sdkServerDoc.icons) && sdkServerDoc.icons.length >= 1 && sdkServerDoc.icons[0].src === "https://red-shape-1b3b.daviddelmoral79.workers.dev/favicon.svg", "server.json must declare HTTPS icons");
 assert.ok(sdkServerDoc.description.length <= 100 && sdkServerDoc.description.includes("$0.01"), "server.json description must be <=100 chars and highlight $0.01");
 assert.deepStrictEqual(sdkServerDoc, rootServerDoc, "sdk server.json and mcp_registry_server.json must be identical");
 assert.ok(readmeDoc.includes("wrapFetchWithPayment") && readmeDoc.includes("mcprush.com/badge") && readmeDoc.includes("/compact.svg"), "README.md must include 5-line x402 snippet and non-overlapping compact.svg mcprush badge");
@@ -221,6 +225,15 @@ assert.ok(readmeDoc.includes("wrapFetchWithPayment") && readmeDoc.includes("mcpr
     const pViemCli = new IngravitySecurityActionProvider({ workerUrl: mockApiUrl, walletProvider: mockViemClient, maxSpendUsdc: 0.05, enableReceiptCache: false });
     const rViemCli = await pViemCli.fastPing({ address: BASE_USDC_CONTRACT, chainId: 8453 });
     assert.strictEqual(rViemCli.verdict, "SAFE", "Viem WalletClient auto-pay must succeed");
+
+    // Mode E: 1-Command CLI Auto-Pay (`npx ingravity-security ping 0x...`)
+    lastDecodedPayment = null;
+    const cliPingRes = await runCliCommand(["ping", BASE_USDC_CONTRACT, "8453"], { apiUrl: mockApiUrl, privateKey: TEST_PRIV_KEY, maxSpendUsdc: 0.05 });
+    assert.strictEqual(cliPingRes.verdict, "SAFE", "1-command CLI ping auto-pay must succeed");
+    assert.strictEqual(
+      ethers.verifyTypedData(testDomain, testTypes, lastDecodedPayment.payload.authorization, lastDecodedPayment.payload.signature),
+      ethersRefWallet.address
+    );
 
     // MCP 1: Unpaid call using snake_case alias must expose _meta['x402/error'] + isError: true
     const rawUnpaid = await forwardMcpLine(

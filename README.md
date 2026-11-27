@@ -2,7 +2,7 @@
 
 Self-contained, zero-dependency **Model Context Protocol (`MCP 2025-06-18`) STDIO Server (`mcp.js`)** and **Universal Web3 SDK (`index.js` — Viem, Ethers v5/v6, Coinbase AgentKit, ElizaOS & raw `privateKey`)** for 5-EVM pre-flight security, EVM calldata structural decoding, ERC-8021 Base Builder attribution, live RPC token honeypot scanning, BigInt DeFi MEV slippage math, and 24-vector Solidity auditing across **Base (`8453`)**, **Arbitrum (`42161`)**, **Optimism (`10`)**, **Polygon (`137`)**, and **Ethereum (`1`)**.
 
-[![npm version](https://img.shields.io/badge/npm-1.3.5-blue.svg)](https://www.npmjs.com/package/ingravity-security)
+[![npm version](https://img.shields.io/badge/npm-1.3.6-blue.svg)](https://www.npmjs.com/package/ingravity-security)
 [![Listed on mcpservers.org](https://mcpservers.org/badge.svg)](https://mcpservers.org/servers/dms1979/ingravity-security)
 [![mcprush Grade A](https://mcprush.com/badge/ingravity-autonomous-evm-security-defi-guard-mcp/compact.svg)](https://mcprush.com/to/ingravity-autonomous-evm-security-defi-guard-mcp?ref=badge)
 [![DMS1979/ingravity-security MCP server](https://glama.ai/mcp/servers/DMS1979/ingravity-security/badges/score.svg)](https://glama.ai/mcp/servers/DMS1979/ingravity-security)
@@ -25,7 +25,18 @@ This repository contains the complete, runnable **STDIO MCP Server (`mcp.js`)**,
 
 ---
 
-## Quickstart (Zero-Dependency Auto-Pay, `@x402/fetch`, MCP & Docker)
+## Quickstart (1-Command CLI, Zero-Dep Auto-Pay, `@x402/fetch`, MCP & Docker)
+
+### Option 0: Instant 1-Command Terminal CLI (`$0.01 USDC` Gasless Base Auto-Pay)
+
+```bash
+# Instant $0.01 USDC SAFE/DANGER check (0 ETH gas — EIP-3009 sponsored on Base)
+INGRAVITY_PRIVATE_KEY=0xYOUR_BOT_KEY npx -y ingravity-security@1.3.6 ping 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+
+# Direct 0x Token Honeypot Scan ($0.04 Signal / $0.12 Full) or <15ms Prepaid Pass ($1 -> 115 pings)
+INGRAVITY_PRIVATE_KEY=0xYOUR_BOT_KEY npx -y ingravity-security@1.3.6 scan 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+INGRAVITY_PRIVATE_KEY=0xYOUR_BOT_KEY npx -y ingravity-security@1.3.6 pass 1
+```
 
 ### Option 1: Zero-Dependency 4-Line Node.js Auto-Pay (`ingravity-security`)
 
@@ -60,7 +71,7 @@ Add to `claude_desktop_config.json` or `.cursor/mcp.json`:
   "mcpServers": {
     "ingravity-security": {
       "command": "npx",
-      "args": ["-y", "-p", "ingravity-security@1.3.5", "ingravity-mcp"],
+      "args": ["-y", "-p", "ingravity-security@1.3.6", "ingravity-mcp"],
       "env": {
         "INGRAVITY_AGENT_BUDGET": "0.10",
         "INGRAVITY_PRIVATE_KEY": "0xYOUR_OPTIONAL_DEDICATED_BOT_KEY"

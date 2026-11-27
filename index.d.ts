@@ -3,6 +3,7 @@ export interface IngravityConfig {
   payToWallet?: string;
   walletProvider?: any;
   privateKey?: string;
+  passToken?: string;
   maxSpendUsdc?: number;
   capitalAtRiskUsd?: number;
   enableReceiptCache?: boolean;
@@ -112,11 +113,14 @@ export class IngravitySecurityActionProvider {
   workerUrl: string;
   payToWallet: string;
   walletProvider: any;
+  passToken: string | null;
   maxSpendUsdc: number | null;
   capitalAtRiskUsd: number | null;
   enableReceiptCache: boolean;
   clearReceiptCache(): void;
   getActions(): any[];
+  topupPass(params?: { usdAmount?: number; passToken?: string }): Promise<any>;
+  checkPassBalance(params?: { passToken?: string }): Promise<any>;
   fastPing(params: FastPingParams): Promise<any>;
   txFirewall(params: TxFirewallParams): Promise<any>;
   tokenRugScanner(params: TokenRugScannerParams): Promise<any>;

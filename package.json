@@ -1,8 +1,8 @@
 {
   "name": "ingravity-security",
   "mcpName": "io.github.DMS1979/ingravity-security",
-  "version": "1.3.5",
-  "description": "Zero-dependency Node.js MCP 2025-06-18 Server & Universal Web3 SDK (Viem, Ethers v5/v6, AgentKit, ElizaOS) for 5-EVM Security: $0.01 Fast-Ping, $0.04-$0.12 Honeypot Scanner, $0.10 Tx Firewall & 24-vector Solidity Auditor via gasless x402 v2 Base USDC.",
+  "version": "1.3.6",
+  "description": "Zero-dependency CLI, MCP 2025-06-18 Server & Universal Web3 SDK (Viem, Ethers, AgentKit, ElizaOS) for 5-EVM Security: 1-command $0.01 Fast-Ping, Honeypot Scanner, Tx Firewall, Solidity Auditor & <15ms Prepaid Pass via gasless x402 v2 Base USDC.",
   "main": "index.js",
   "types": "index.d.ts",
   "bin": {
@@ -15,6 +15,7 @@
     "mcp.js",
     "README.md",
     "AGENTS.md",
+    "SKILL.md",
     "server.json",
     "glama.json",
     "examples/"
